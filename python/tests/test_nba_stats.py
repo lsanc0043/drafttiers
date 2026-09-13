@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from nba_players import previous_nba_season_id
-from nba_stats import fetch_stats_bundle, normalize_game_log, normalize_season_stats, parse_minutes
+from nba_stats import fetch_stats_bundle, normalize_game_log, normalize_season_stats, normalize_team_game, parse_minutes
 
 
 def test_parse_minutes_from_clock_string():
@@ -95,6 +95,25 @@ def test_normalize_game_log_accepts_player_game_log_headers():
     assert row["minutes"] == 31.0
 
 
+def test_normalize_team_game():
+    row = normalize_team_game(
+        {
+            "TEAM_ID": 1610612748,
+            "TEAM_ABBREVIATION": "MIA",
+            "GAME_ID": "0022500100",
+            "GAME_DATE": "2026-01-15",
+        },
+        "2025-26",
+    )
+    assert row == {
+        "teamId": 1610612748,
+        "teamAbbr": "MIA",
+        "gameId": "0022500100",
+        "gameDate": "2026-01-15",
+        "season": "2025-26",
+    }
+
+
 def test_fetch_stats_bundle_uses_injected_bulk_fetchers():
     catalog = fetch_stats_bundle(
         season="2026-27",
@@ -143,6 +162,7 @@ def test_fetch_stats_bundle_uses_injected_bulk_fetchers():
         else (_ for _ in ()).throw(RuntimeError("no playoffs"))
         if season_type == "Playoffs"
         else [],
+        team_game_fetcher=lambda season, season_type: [],
     )
     assert catalog["season"] == "2026-27"
     assert previous_nba_season_id("2026-27") == "2025-26"
@@ -200,6 +220,7 @@ def test_fetch_stats_bundle_individual_does_not_call_league_bulk():
         ]
         if season_type == "Regular Season"
         else [],
+        team_game_fetcher=lambda season, season_type: [],
     )
     assert catalog["seasonStats"][0]["points"] == 20.0
     assert catalog["gameLogs"][0]["gameId"] == "0022500999"

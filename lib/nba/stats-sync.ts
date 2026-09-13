@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { parseNbaStatsBundle, runNbaStatsPythonSync } from "@/lib/nba/python";
-import { mapStatsToKnownPlayers, persistGameLogs, persistSeasonStats } from "@/lib/nba/stats-upsert";
+import { mapStatsToKnownPlayers, persistGameLogs, persistSeasonStats, persistTeamGames } from "@/lib/nba/stats-upsert";
 
 const SYNC_ID = "nba-stats";
 const STALE_RUNNING_MS = 5 * 60 * 1000;
@@ -111,6 +111,7 @@ export async function syncNbaStats(
 
     await persistSeasonStats(db, seasonMapped.mapped, syncedAt);
     await persistGameLogs(db, gameMapped.mapped, syncedAt);
+    await persistTeamGames(db, bundle.teamGames, syncedAt);
 
     const playersProcessed = new Set([
       ...seasonMapped.mapped.map((row) => row.playerId),

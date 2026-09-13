@@ -7,6 +7,19 @@ export function isRookieForLeagueYear(fromYear: number | null | undefined, today
 }
 
 export const FANTASY_AVERAGE_SEASON = "2025-26";
+export const GAME_LOG_SEASONS = ["2025-26", "2026-27"] as const;
+export type GameLogSeason = (typeof GAME_LOG_SEASONS)[number];
+
+export function isGameLogSeason(value: string): value is GameLogSeason {
+  return (GAME_LOG_SEASONS as readonly string[]).includes(value);
+}
+
+export function gameLogDateRange() {
+  return {
+    start: seasonDateRange(GAME_LOG_SEASONS[0]).start,
+    end: seasonDateRange(GAME_LOG_SEASONS[GAME_LOG_SEASONS.length - 1]).end,
+  };
+}
 
 export function seasonDateRange(season: string = FANTASY_AVERAGE_SEASON) {
   const startYear = Number(season.split("-")[0]);

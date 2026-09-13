@@ -246,6 +246,7 @@ describe("GET player detail", () => {
           jerseyNumber: "23",
           isActive: true,
           fromYear: 2003,
+          teamId: 1610612747,
         }),
       },
       playerSeasonStats: {
@@ -259,6 +260,25 @@ describe("GET player detail", () => {
         if (sql.includes("PlayerSeasonStats")) {
           return [{ ...seasonRow, playerId: "player-1" }];
         }
+        if (sql.includes("TeamGame")) {
+          return [
+            {
+              gameId: "0022500001",
+              gameDate: new Date("2026-04-10T00:00:00.000Z"),
+              opponentAbbr: "BOS",
+            },
+            {
+              gameId: "0022500002",
+              gameDate: new Date("2026-01-15T00:00:00.000Z"),
+              opponentAbbr: "MIA",
+            },
+            {
+              gameId: "0022500999",
+              gameDate: new Date("2026-02-01T00:00:00.000Z"),
+              opponentAbbr: "NYK",
+            },
+          ];
+        }
         const extraGame = {
           ...gameRow,
           gameId: "0022500002",
@@ -271,15 +291,6 @@ describe("GET player detail", () => {
           threePointersMade: 0,
           gameDate: new Date("2026-01-15T00:00:00.000Z"),
         };
-        if (sql.includes("LIMIT 10")) {
-          return [
-            {
-              ...gameRow,
-              playerId: "player-1",
-              gameDate: new Date("2026-04-10T00:00:00.000Z"),
-            },
-          ];
-        }
         return [
           {
             ...gameRow,
@@ -295,7 +306,8 @@ describe("GET player detail", () => {
 
     expect(detail?.player.fullName).toBe("LeBron James");
     expect(detail?.seasonStats?.points).toBe(25.4);
-    expect(detail?.recentGames).toHaveLength(1);
+    expect(detail?.recentGames).toHaveLength(3);
+    expect(detail?.gameLog.some((game) => game.didNotPlay)).toBe(true);
     expect(detail?.seasonFantasy.gamesPlayed).toBe(2);
     expect(detail?.seasonFantasy.averageFantasyPoints).toBe(
       ((30 + 8 + 18 + 8 + 4 - 6 + 3) + 10) / 2,

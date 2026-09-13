@@ -6,9 +6,11 @@ import {
   nbaPlayerSchema,
   nbaSeasonStatSchema,
   nbaStatsBundleSchema,
+  nbaTeamGameSchema,
   type NbaGameLogInput,
   type NbaPlayerInput,
   type NbaSeasonStatInput,
+  type NbaTeamGameInput,
 } from "@/lib/nba/schema";
 
 const DEFAULT_TIMEOUT_MS = 120_000;
@@ -47,6 +49,7 @@ export function parseNbaCatalog(raw: unknown): PythonCatalogResult {
 export type PythonStatsResult = {
   seasonStats: NbaSeasonStatInput[];
   gameLogs: NbaGameLogInput[];
+  teamGames: NbaTeamGameInput[];
   parseFailed: number;
   errors: string[];
   season?: string;
@@ -56,6 +59,7 @@ export function parseNbaStatsBundle(raw: unknown): PythonStatsResult {
   const catalog = nbaStatsBundleSchema.parse(raw);
   const seasonStats: NbaSeasonStatInput[] = [];
   const gameLogs: NbaGameLogInput[] = [];
+  const teamGames: NbaTeamGameInput[] = [];
   let parseFailed = 0;
 
   for (const row of catalog.seasonStats) {
@@ -76,9 +80,19 @@ export function parseNbaStatsBundle(raw: unknown): PythonStatsResult {
     }
   }
 
+  for (const row of catalog.teamGames) {
+    const parsed = nbaTeamGameSchema.safeParse(row);
+    if (parsed.success) {
+      teamGames.push(parsed.data);
+    } else {
+      parseFailed += 1;
+    }
+  }
+
   return {
     seasonStats,
     gameLogs,
+    teamGames,
     parseFailed,
     errors: catalog.errors,
     season: catalog.season,

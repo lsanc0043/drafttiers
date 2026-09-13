@@ -11,7 +11,7 @@ from typing import Any, Callable, Mapping
 
 from nba_players import _as_int, _as_str, _rows_from_dataset, nba_season_id, previous_nba_season_id
 
-SEASON_TYPES = ("Regular Season", "Playoffs")
+SEASON_TYPES = ("Preseason", "Regular Season", "PlayIn", "Playoffs")
 
 
 def parse_minutes(value: Any) -> float:
@@ -152,6 +152,35 @@ def fetch_league_game_logs(season: str, season_type: str) -> list[dict[str, Any]
     return _rows_from_dataset(dataset.league_game_log.get_dict())
 
 
+def fetch_league_team_games(season: str, season_type: str) -> list[dict[str, Any]]:
+    from nba_api.stats.endpoints import leaguegamelog
+    from nba_api.stats.library.parameters import PlayerOrTeamAbbreviation
+
+    dataset = leaguegamelog.LeagueGameLog(
+        player_or_team_abbreviation=PlayerOrTeamAbbreviation.team,
+        season=season,
+        season_type_all_star=season_type,
+        timeout=90,
+    )
+    return _rows_from_dataset(dataset.league_game_log.get_dict())
+
+
+def normalize_team_game(row: Mapping[str, Any], season: str) -> dict[str, Any] | None:
+    team_id = _as_int(row.get("TEAM_ID") or row.get("teamId"))
+    game_id = _as_str(row.get("GAME_ID") or row.get("Game_ID") or row.get("gameId"))
+    game_date = parse_game_date(row.get("GAME_DATE") or row.get("gameDate"))
+    team_abbr = _as_str(row.get("TEAM_ABBREVIATION") or row.get("teamAbbr"))
+    if team_id is None or team_id <= 0 or not game_id or not game_date:
+        return None
+    return {
+        "teamId": team_id,
+        "teamAbbr": team_abbr or "",
+        "gameId": game_id,
+        "gameDate": game_date,
+        "season": season,
+    }
+
+
 def fetch_player_career_totals(nba_person_id: int) -> list[dict[str, Any]]:
     from nba_api.stats.endpoints import playercareerstats
 
@@ -208,16 +237,36 @@ def _collect_game_logs(
     return list(by_key.values())
 
 
+def _collect_team_games(
+    seasons: list[str],
+    fetcher: Callable[[str, str], Any],
+    errors: list[str],
+) -> list[dict[str, Any]]:
+    by_key: dict[tuple[int, str], dict[str, Any]] = {}
+    for season in seasons:
+        for season_type in SEASON_TYPES:
+            try:
+                for row in _rows_from_dataset(fetcher(season, season_type)):
+                    normalized = normalize_team_game(row, season)
+                    if normalized is None:
+                        continue
+                    by_key[(normalized["teamId"], normalized["gameId"])] = normalized
+            except Exception as exc:  # noqa: BLE001 - missing playoff logs are common
+                errors.append(f"team games {season} {season_type}: {exc}")
+    return list(by_key.values())
+
+
 def fetch_stats_bundle(
     nba_person_id: int | None = None,
     season: str | None = None,
     season_stats_fetcher: Callable[[str], Any] | None = None,
     game_log_fetcher: Callable[[str, str], Any] | None = None,
+    team_game_fetcher: Callable[[str, str], Any] | None = None,
     career_fetcher: Callable[[int], Any] | None = None,
     player_log_fetcher: Callable[[int, str, str], Any] | None = None,
 ) -> dict[str, Any]:
     current = season or nba_season_id()
-    seasons = [current, previous_nba_season_id(current)]
+    seasons = ["2025-26", "2026-27"]
     errors: list[str] = []
 
     if nba_person_id is None:
@@ -245,11 +294,18 @@ def fetch_stats_bundle(
 
         game_logs = _collect_game_logs(seasons, player_logs, errors)
 
+    team_games = _collect_team_games(
+        seasons,
+        team_game_fetcher or fetch_league_team_games,
+        errors,
+    )
+
     return {
         "source": "nba_api",
         "season": current,
         "seasons": seasons,
         "seasonStats": season_stats,
         "gameLogs": game_logs,
+        "teamGames": team_games,
         "errors": errors,
     }

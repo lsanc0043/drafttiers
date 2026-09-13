@@ -151,6 +151,20 @@ model PlayerGameLog {
   @@index([playerId, gameDate])
 }
 
+model TeamGame {
+  id        String   @id @default(cuid())
+  teamId    Int
+  teamAbbr  String
+  gameId    String
+  gameDate  DateTime
+  season    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teamId, gameId])
+  @@index([teamId, season, gameDate])
+}
+
 model BoardPlayer {
   id        String   @id @default(cuid())
   boardId   String

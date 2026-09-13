@@ -1,7 +1,7 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import { Prisma as PrismaSql } from "@prisma/client";
 import { chunk } from "@/lib/nba/upsert";
-import type { NbaGameLogInput, NbaSeasonStatInput } from "@/lib/nba/schema";
+import type { NbaGameLogInput, NbaSeasonStatInput, NbaTeamGameInput } from "@/lib/nba/schema";
 
 const UPSERT_CHUNK_SIZE = 300;
 
@@ -143,6 +143,39 @@ function gameLogInsertValues(row: NbaGameLogInput & { playerId: string }, now: D
     ${row.threePointersAttempted},
     ${row.freeThrowsMade},
     ${row.freeThrowsAttempted},
+    ${now},
+    ${now}
+  )`;
+}
+
+export async function persistTeamGames(db: PrismaClient, games: NbaTeamGameInput[], now: Date) {
+  if (games.length === 0) {
+    return;
+  }
+  for (const group of chunk(games, UPSERT_CHUNK_SIZE)) {
+    const values = group.map((row) => teamGameInsertValues(row, now));
+    await db.$executeRaw`
+      INSERT INTO "TeamGame" (
+        "id", "teamId", "teamAbbr", "gameId", "gameDate", "season", "createdAt", "updatedAt"
+      )
+      VALUES ${PrismaSql.join(values)}
+      ON CONFLICT ("teamId", "gameId") DO UPDATE SET
+        "teamAbbr" = EXCLUDED."teamAbbr",
+        "gameDate" = EXCLUDED."gameDate",
+        "season" = EXCLUDED."season",
+        "updatedAt" = EXCLUDED."updatedAt"
+    `;
+  }
+}
+
+function teamGameInsertValues(row: NbaTeamGameInput, now: Date) {
+  return PrismaSql.sql`(
+    ${crypto.randomUUID()},
+    ${row.teamId},
+    ${row.teamAbbr},
+    ${row.gameId},
+    ${new Date(`${row.gameDate}T00:00:00.000Z`)},
+    ${row.season},
     ${now},
     ${now}
   )`;

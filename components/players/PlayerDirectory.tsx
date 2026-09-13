@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { FantasyScoringModal } from "@/components/players/FantasyScoringModal";
-import { PlayerCard, type PlayerCardData } from "@/components/players/PlayerCard";
+import {
+  PlayerCard,
+  type PlayerCardData,
+} from "@/components/players/PlayerCard";
 import { PlayerModal } from "@/components/players/PlayerModal";
 import { useFantasyScoring } from "@/hooks/useFantasyScoring";
 
@@ -17,7 +20,7 @@ type PlayersResponse = {
 export function PlayerDirectory() {
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState("");
-  const [sort, setSort] = useState<"name" | "fantasy">("name");
+  const [sort, setSort] = useState<"name" | "fantasy">("fantasy");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<PlayersResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,10 +51,17 @@ export function PlayerDirectory() {
         setError(null);
       })
       .catch((loadError: unknown) => {
-        if (loadError instanceof DOMException && loadError.name === "AbortError") {
+        if (
+          loadError instanceof DOMException &&
+          loadError.name === "AbortError"
+        ) {
           return;
         }
-        setError(loadError instanceof Error ? loadError.message : "Could not load players");
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Could not load players",
+        );
       });
 
     return () => controller.abort();
@@ -103,7 +113,9 @@ export function PlayerDirectory() {
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      <p className="text-sm text-zinc-500">{data ? `${data.total} players` : "Loading..."}</p>
+      <p className="text-sm text-zinc-500">
+        {data ? `${data.total} players` : "Loading..."}
+      </p>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {data?.players.map((player) => (

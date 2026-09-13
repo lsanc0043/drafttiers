@@ -73,14 +73,24 @@ export const nbaGameLogSchema = z.object({
   freeThrowsAttempted: z.number().int().nonnegative(),
 });
 
+export const nbaTeamGameSchema = z.object({
+  teamId: z.number().int().positive(),
+  teamAbbr: z.string().trim().max(10).optional().default(""),
+  gameId: z.string().trim().min(1).max(32),
+  gameDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  season: z.string().min(4).max(16),
+});
+
 export const nbaStatsBundleSchema = z.object({
   source: z.string().optional(),
   season: z.string().optional(),
   seasons: z.array(z.string()).optional(),
   seasonStats: z.array(z.unknown()),
   gameLogs: z.array(z.unknown()),
+  teamGames: z.array(z.unknown()).optional().default([]),
   errors: z.array(z.string()).optional().default([]),
 });
 
 export type NbaSeasonStatInput = z.infer<typeof nbaSeasonStatSchema>;
 export type NbaGameLogInput = z.infer<typeof nbaGameLogSchema>;
+export type NbaTeamGameInput = z.infer<typeof nbaTeamGameSchema>;

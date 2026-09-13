@@ -1,8 +1,9 @@
 import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import { gameLogBucket, mergeSeasonGameLog } from "@/lib/nba/game-log";
 import { scoreFantasyGame } from "@/lib/nba/fantasy";
 import { getInjuryIndex, getPlayerInjury } from "@/lib/nba/injuries";
-import { FANTASY_AVERAGE_SEASON, isRookieForLeagueYear, seasonDateRange } from "@/lib/nba/season";
+import { FANTASY_AVERAGE_SEASON, gameLogDateRange, isRookieForLeagueYear } from "@/lib/nba/season";
 
 type SeasonStatRow = {
   season: string;
@@ -40,6 +41,12 @@ type GameLogRow = {
   freeThrowsAttempted: number;
 };
 
+type TeamGameRow = {
+  gameId: string;
+  gameDate: Date;
+  opponentAbbr?: string | null;
+};
+
 export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
   const numericId = Number(id);
   const player = await db.player.findFirst({
@@ -52,9 +59,10 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
     return null;
   }
 
-  const { start: seasonStart, end: seasonEnd } = seasonDateRange(FANTASY_AVERAGE_SEASON);
+  const { start: seasonStart, end: seasonEnd } = gameLogDateRange();
+  const teamId = "teamId" in player ? (player.teamId as number | null) : null;
 
-  const [seasonStats, recentGames, seasonGames, injuries] = await Promise.all([
+  const [seasonStats, seasonGames, teamGames, injuries] = await Promise.all([
     db.$queryRaw<SeasonStatRow[]>`
       SELECT
         "season",
@@ -96,37 +104,66 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
         "freeThrowsAttempted"
       FROM "PlayerGameLog"
       WHERE "playerId" = ${player.id}
-      ORDER BY "gameDate" DESC
-      LIMIT 10
-    `,
-    db.$queryRaw<GameLogRow[]>`
-      SELECT
-        "gameId",
-        "gameDate",
-        "minutes",
-        "points",
-        "rebounds",
-        "assists",
-        "steals",
-        "blocks",
-        "turnovers",
-        "fieldGoalsMade",
-        "fieldGoalsAttempted",
-        "threePointersMade",
-        "threePointersAttempted",
-        "freeThrowsMade",
-        "freeThrowsAttempted"
-      FROM "PlayerGameLog"
-      WHERE "playerId" = ${player.id}
         AND "gameDate" >= ${seasonStart}
         AND "gameDate" < ${seasonEnd}
       ORDER BY "gameDate" DESC
+    `,
+    db.$queryRaw<TeamGameRow[]>`
+      WITH inferred_teams AS (
+        SELECT tg."teamId", tg."season"
+        FROM "PlayerGameLog" gl
+        INNER JOIN "TeamGame" tg ON tg."gameId" = gl."gameId"
+        WHERE gl."playerId" = ${player.id}
+          AND gl."gameDate" >= ${seasonStart}
+          AND gl."gameDate" < ${seasonEnd}
+        GROUP BY tg."teamId", tg."season"
+        HAVING COUNT(*) > 7
+      ),
+      season_teams AS (
+        SELECT "teamId", "season" FROM inferred_teams
+        UNION ALL
+        SELECT ${teamId} AS "teamId", s."season"
+        FROM (VALUES ('2025-26'), ('2026-27')) AS s("season")
+        WHERE ${teamId} IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM inferred_teams)
+      )
+      SELECT DISTINCT ON (tg."gameId")
+        tg."gameId",
+        tg."gameDate",
+        COALESCE(tg_opp."teamAbbr", opp_p."teamAbbr") AS "opponentAbbr"
+      FROM "TeamGame" tg
+      INNER JOIN season_teams st
+        ON st."teamId" = tg."teamId"
+       AND st."season" = tg."season"
+      LEFT JOIN "TeamGame" tg_opp
+        ON tg_opp."gameId" = tg."gameId"
+       AND tg_opp."teamId" <> tg."teamId"
+      LEFT JOIN "PlayerGameLog" opp_gl
+        ON opp_gl."gameId" = tg."gameId"
+      LEFT JOIN "Player" opp_p
+        ON opp_p.id = opp_gl."playerId"
+       AND opp_p."teamId" IS DISTINCT FROM tg."teamId"
+      WHERE tg."gameDate" >= ${seasonStart}
+        AND tg."gameDate" < ${seasonEnd}
+      ORDER BY tg."gameId", tg_opp."teamAbbr", opp_p."teamAbbr"
     `,
     getInjuryIndex(),
   ]);
 
   const latestSeason = seasonStats[0] ?? null;
   const injury = getPlayerInjury(player, injuries);
+  const playedGames = seasonGames.map((game) => ({ ...serializeGame(game), didNotPlay: false }));
+  const gameLog = mergeSeasonGameLog(
+    playedGames,
+    teamGames.map((game) => ({
+      gameId: game.gameId,
+      gameDate: (game.gameDate instanceof Date ? game.gameDate : new Date(game.gameDate)).toISOString(),
+      opponentAbbr: game.opponentAbbr ?? null,
+    })),
+  ).filter((game) => gameLogBucket(game.gameId, game.gameDate) != null);
+  const fantasySeasonGames = playedGames.filter(
+    (game) => gameLogBucket(game.gameId, game.gameDate)?.season === FANTASY_AVERAGE_SEASON,
+  );
 
   return {
     player: {
@@ -166,16 +203,19 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
           freeThrowsAttempted: Number(latestSeason.freeThrowsAttempted),
         }
       : null,
-    recentGames: recentGames.map(serializeGame),
+    recentGames: gameLog,
+    gameLog,
     seasonFantasy: {
       season: FANTASY_AVERAGE_SEASON,
-      gamesPlayed: seasonGames.length,
+      gamesPlayed: fantasySeasonGames.length,
       averageFantasyPoints:
-        seasonGames.length === 0
+        fantasySeasonGames.length === 0
           ? null
-          : seasonGames.reduce((sum, game) => sum + scoreFantasyGame(toBox(game)).fantasyPoints, 0) /
-            seasonGames.length,
-      games: seasonGames.map(serializeGame),
+          : fantasySeasonGames.reduce(
+              (sum, game) => sum + scoreFantasyGame(toBox(game)).fantasyPoints,
+              0,
+            ) / fantasySeasonGames.length,
+      games: fantasySeasonGames,
     },
   };
 }
@@ -215,5 +255,6 @@ function serializeGame(game: GameLogRow) {
     fantasyPoints: fantasy.fantasyPoints,
     doubleDouble: fantasy.doubleDouble,
     tripleDouble: fantasy.tripleDouble,
+    didNotPlay: false,
   };
 }
