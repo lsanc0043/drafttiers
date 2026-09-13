@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum BoardVisibility {
+  PRIVATE
+  SHARED
+}
+
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  displayName     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  boards          Board[]
+  sleeperAccounts SleeperAccount[]
+}
+
+model Board {
+  id            String         @id @default(cuid())
+  name          String
+  ownerId       String?
+  owner         User?          @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  visibility    BoardVisibility @default(PRIVATE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  buckets       Bucket[]
+  assignments   BoardPlayer[]
+  sleeperDrafts SleeperDraft[]
+
+  @@index([ownerId])
+}
+
+model Bucket {
+  id        String        @id @default(cuid())
+  boardId   String
+  board     Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  name      String
+  sortOrder Int
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  players   BoardPlayer[]
+
+  @@index([boardId, sortOrder])
+}
+
+model Player {
+  id           String        @id @default(cuid())
+  nbaPersonId  Int           @unique
+  fullName     String
+  firstName    String?
+  lastName     String?
+  teamAbbr     String?
+  position     String?
+  jerseyNumber String?
+  isActive     Boolean       @default(true)
+  syncedAt     DateTime      @default(now())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  boardPlayers BoardPlayer[]
+
+  @@index([fullName])
+}
+
+model BoardPlayer {
+  id        String   @id @default(cuid())
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  bucketId  String
+  bucket    Bucket   @relation(fields: [bucketId], references: [id], onDelete: Cascade)
+  playerId  String
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  sortOrder Int
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([boardId, playerId])
+  @@index([bucketId, sortOrder])
+}
+
+model SleeperAccount {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sleeperUserId   String
+  sleeperUsername String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  drafts          SleeperDraft[]
+
+  @@unique([userId, sleeperUserId])
+}
+
+model SleeperDraft {
+  id             String          @id @default(cuid())
+  boardId        String
+  board          Board           @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  accountId      String?
+  account        SleeperAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  sleeperDraftId String          @unique
+  status         String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  events         DraftEvent[]
+
+  @@index([boardId])
+}
+
+model DraftEvent {
+  id        String       @id @default(cuid())
+  draftId   String
+  draft     SleeperDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  type      String
+  payload   Json
+  createdAt DateTime     @default(now())
+
+  @@index([draftId, createdAt])
+}
