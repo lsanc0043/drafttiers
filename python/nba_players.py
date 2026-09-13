@@ -22,6 +22,11 @@ def nba_season_id(today: date | None = None) -> str:
     return f"{start_year}-{str(start_year + 1)[2:]}"
 
 
+def previous_nba_season_id(season: str) -> str:
+    start_year = int(season.split("-", 1)[0])
+    return f"{start_year - 1}-{str(start_year)[2:]}"
+
+
 def _as_int(value: Any) -> int | None:
     if value is None or value == "":
         return None

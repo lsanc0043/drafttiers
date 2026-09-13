@@ -75,6 +75,8 @@ model Player {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   boardPlayers BoardPlayer[]
+  seasonStats  PlayerSeasonStats[]
+  gameLogs     PlayerGameLog[]
 
   @@index([fullName])
   @@index([lastName, firstName])
@@ -95,6 +97,72 @@ model NbaSyncState {
   lastError      String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+}
+
+model PlayerSeasonStats {
+  id                      String   @id @default(cuid())
+  playerId                String
+  player                  Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  season                  String
+  gamesPlayed             Int
+  minutes                 Float
+  points                  Float
+  rebounds                Float
+  assists                 Float
+  steals                  Float
+  blocks                  Float
+  turnovers               Float
+  fieldGoalsMade          Float
+  fieldGoalsAttempted     Float
+  threePointersMade       Float
+  threePointersAttempted  Float
+  freeThrowsMade          Float
+  freeThrowsAttempted     Float
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([playerId, season])
+  @@index([season])
+}
+
+model PlayerGameLog {
+  id                      String   @id @default(cuid())
+  playerId                String
+  player                  Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  gameId                  String
+  gameDate                DateTime
+  minutes                 Float
+  points                  Int
+  rebounds                Int
+  assists                 Int
+  steals                  Int
+  blocks                  Int
+  turnovers               Int
+  fieldGoalsMade          Int
+  fieldGoalsAttempted     Int
+  threePointersMade       Int
+  threePointersAttempted  Int
+  freeThrowsMade          Int
+  freeThrowsAttempted     Int
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([playerId, gameId])
+  @@index([playerId, gameDate])
+}
+
+model TeamGame {
+  id        String   @id @default(cuid())
+  teamId    Int
+  teamAbbr  String
+  gameId    String
+  gameDate  DateTime
+  season    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teamId, gameId])
+  @@index([teamId, season, gameDate])
 }
 
 model BoardPlayer {

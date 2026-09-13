@@ -15,6 +15,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "sync:nba": "python python/sync_players.py",
+    "sync:nba-stats": "python python/sync_stats.py",
     "test:python": "python -m pytest python/tests -q"
   },
   "dependencies": {

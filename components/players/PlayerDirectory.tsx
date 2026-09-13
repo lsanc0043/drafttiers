@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PlayerCard, type PlayerCardData } from "@/components/players/PlayerCard";
+import { FantasyScoringModal } from "@/components/players/FantasyScoringModal";
+import {
+  PlayerCard,
+  type PlayerCardData,
+} from "@/components/players/PlayerCard";
 import { PlayerModal } from "@/components/players/PlayerModal";
+import { useFantasyScoring } from "@/hooks/useFantasyScoring";
 
 type PlayersResponse = {
   players: PlayerCardData[];
@@ -15,10 +20,13 @@ type PlayersResponse = {
 export function PlayerDirectory() {
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState("");
+  const [sort, setSort] = useState<"name" | "fantasy">("fantasy");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<PlayersResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<PlayerCardData | null>(null);
+  const [scoringOpen, setScoringOpen] = useState(false);
+  const { scoring, update } = useFantasyScoring();
 
   useEffect(() => {
     const params = new URLSearchParams({
@@ -26,10 +34,12 @@ export function PlayerDirectory() {
       page: String(page),
       pageSize: "24",
       active: "true",
+      sort,
     });
     if (team) {
       params.set("team", team);
     }
+    params.set("scoring", JSON.stringify(scoring));
 
     const controller = new AbortController();
     fetch(`/api/players?${params.toString()}`, { signal: controller.signal })
@@ -41,18 +51,25 @@ export function PlayerDirectory() {
         setError(null);
       })
       .catch((loadError: unknown) => {
-        if (loadError instanceof DOMException && loadError.name === "AbortError") {
+        if (
+          loadError instanceof DOMException &&
+          loadError.name === "AbortError"
+        ) {
           return;
         }
-        setError(loadError instanceof Error ? loadError.message : "Could not load players");
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Could not load players",
+        );
       });
 
     return () => controller.abort();
-  }, [query, team, page]);
+  }, [query, team, page, sort, scoring]);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <input
           value={query}
           onChange={(event) => {
@@ -71,11 +88,34 @@ export function PlayerDirectory() {
           className="w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 sm:max-w-xs dark:border-zinc-700"
           placeholder="Team, city, or abbr"
         />
+        <button
+          type="button"
+          onClick={() => setScoringOpen(true)}
+          className="rounded-md border border-zinc-300 px-3 py-2 text-sm whitespace-nowrap dark:border-zinc-700"
+        >
+          Fantasy scoring
+        </button>
+        <label className="flex items-center gap-2 text-sm whitespace-nowrap">
+          <span className="text-zinc-500">Sort by</span>
+          <select
+            value={sort}
+            onChange={(event) => {
+              setPage(1);
+              setSort(event.target.value as "name" | "fantasy");
+            }}
+            className="rounded-md border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+          >
+            <option value="name">Alphabetical</option>
+            <option value="fantasy">Avg fantasy points</option>
+          </select>
+        </label>
       </div>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      <p className="text-sm text-zinc-500">{data ? `${data.total} players` : "Loading..."}</p>
+      <p className="text-sm text-zinc-500">
+        {data ? `${data.total} players` : "Loading..."}
+      </p>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {data?.players.map((player) => (
@@ -102,7 +142,21 @@ export function PlayerDirectory() {
         </button>
       </div>
 
-      {selected ? <PlayerModal player={selected} onClose={() => setSelected(null)} /> : null}
+      {selected ? (
+        <PlayerModal
+          player={selected}
+          scoring={scoring}
+          onEditScoring={() => setScoringOpen(true)}
+          onClose={() => setSelected(null)}
+        />
+      ) : null}
+      {scoringOpen ? (
+        <FantasyScoringModal
+          scoring={scoring}
+          onSave={update}
+          onClose={() => setScoringOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
