@@ -14,7 +14,7 @@ export const createBucketSchema = z.object({
 });
 
 export const playerSearchSchema = z.object({
-  query: z.string().trim().min(1).max(80),
+  query: z.string().trim().max(80).optional().default(""),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 

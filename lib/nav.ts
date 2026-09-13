@@ -2,6 +2,7 @@ export const navItems = [
   { href: "/", label: "Home" },
   { href: "/boards", label: "Boards" },
   { href: "/players", label: "Players" },
+  { href: "/admin", label: "Admin" },
 ] as const;
 
 export function isNavItemActive(href: string, pathname: string) {

@@ -13,6 +13,13 @@ enum BoardVisibility {
   SHARED
 }
 
+enum NbaSyncStatus {
+  IDLE
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
 model User {
   id              String           @id @default(cuid())
   email           String           @unique
@@ -54,19 +61,40 @@ model Bucket {
 model Player {
   id           String        @id @default(cuid())
   nbaPersonId  Int           @unique
+  firstName    String
+  lastName     String
   fullName     String
-  firstName    String?
-  lastName     String?
+  teamId       Int?
   teamAbbr     String?
+  teamName     String?
   position     String?
   jerseyNumber String?
-  isActive     Boolean       @default(true)
+  fromYear     Int?
+  isActive     Boolean       @default(false)
   syncedAt     DateTime      @default(now())
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   boardPlayers BoardPlayer[]
 
   @@index([fullName])
+  @@index([lastName, firstName])
+  @@index([teamAbbr])
+  @@index([isActive])
+}
+
+model NbaSyncState {
+  id             String        @id @default("nba-players")
+  status         NbaSyncStatus @default(IDLE)
+  lastStartedAt  DateTime?
+  lastFinishedAt DateTime?
+  lastSuccessAt  DateTime?
+  fetchedCount   Int?
+  insertedCount  Int?
+  updatedCount   Int?
+  failedCount    Int?
+  lastError      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model BoardPlayer {
