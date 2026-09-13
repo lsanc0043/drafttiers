@@ -4,6 +4,7 @@ import { playerListQuerySchema } from "@/lib/nba/schema";
 import { chunk, dedupePlayers, summarizeUpsert } from "@/lib/nba/upsert";
 import { resetSyncInFlightForTests, syncNbaPlayers, SyncInProgressError } from "@/lib/nba/sync";
 import { listPlayers, teamSearchTerms } from "@/lib/nba/players";
+import { resetInjuryCacheForTests } from "@/lib/nba/injuries";
 import { isRookieForLeagueYear, leagueStartYear } from "@/lib/nba/season";
 import { nbaHeadshotUrl, playerInitials } from "@/lib/nba/headshot";
 
@@ -71,6 +72,7 @@ describe("player list query validation", () => {
     expect(parsed.pageSize).toBe(25);
     expect(parsed.query).toBe("");
     expect(parsed.active).toBe("true");
+    expect(parsed.sort).toBe("name");
   });
 
   it("rejects an oversized page", () => {
@@ -184,12 +186,24 @@ describe("syncNbaPlayers", () => {
 });
 
 describe("listPlayers", () => {
+  beforeEach(() => {
+    resetInjuryCacheForTests();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ injuries: [] }),
+      }),
+    );
+  });
+
   it("applies search, team, active filters and pagination", async () => {
     const db = {
       player: {
         findMany: vi.fn().mockResolvedValue([lebron]),
         count: vi.fn().mockResolvedValue(42),
       },
+      $queryRaw: vi.fn().mockResolvedValue([]),
     };
 
     const result = await listPlayers(
@@ -199,7 +213,11 @@ describe("listPlayers", () => {
 
     expect(result.total).toBe(42);
     expect(result.totalPages).toBe(5);
-    expect(result.players[0]).toMatchObject({ nbaPersonId: 2544, isRookie: false });
+    expect(result.players[0]).toMatchObject({
+      nbaPersonId: 2544,
+      isRookie: false,
+      avgFantasyPoints: null,
+    });
     expect(db.player.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         skip: 10,
@@ -230,6 +248,7 @@ describe("listPlayers", () => {
         findMany: vi.fn().mockResolvedValue([{ ...lebron, fromYear: 2026 }]),
         count: vi.fn().mockResolvedValue(1),
       },
+      $queryRaw: vi.fn().mockResolvedValue([]),
     };
 
     const result = await listPlayers(
@@ -238,6 +257,88 @@ describe("listPlayers", () => {
     );
 
     expect(result.players[0]?.isRookie).toBe(true);
+  });
+
+  it("sorts by average 2025-26 fantasy points", async () => {
+    const db = {
+      player: {
+        findMany: vi.fn().mockResolvedValue([
+          { ...lebron, id: "low", lastName: "Low", firstName: "A", fromYear: 2003 },
+          { ...lebron, id: "high", nbaPersonId: 2, lastName: "High", firstName: "B", fromYear: 2003 },
+        ]),
+        count: vi.fn().mockResolvedValue(2),
+      },
+      $queryRaw: vi.fn().mockResolvedValue([
+        {
+          playerId: "high",
+          points: 30,
+          rebounds: 0,
+          assists: 0,
+          steals: 0,
+          blocks: 0,
+          turnovers: 0,
+          threePointersMade: 0,
+        },
+        {
+          playerId: "low",
+          points: 5,
+          rebounds: 0,
+          assists: 0,
+          steals: 0,
+          blocks: 0,
+          turnovers: 0,
+          threePointersMade: 0,
+        },
+      ]),
+    };
+
+    const result = await listPlayers(
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "fantasy" },
+      db as never,
+    );
+
+    expect(result.players.map((player) => player.id)).toEqual(["high", "low"]);
+    expect(result.players[0]?.avgFantasyPoints).toBe(30);
+  });
+
+  it("marks injured players from the ESPN injury feed", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          injuries: [
+            {
+              injuries: [
+                {
+                  status: "Out",
+                  athlete: {
+                    displayName: "LeBron James",
+                    team: { abbreviation: "LAL", slug: "los-angeles-lakers" },
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      }),
+    );
+
+    const db = {
+      player: {
+        findMany: vi.fn().mockResolvedValue([{ ...lebron, fromYear: 2003 }]),
+        count: vi.fn().mockResolvedValue(1),
+      },
+      $queryRaw: vi.fn().mockResolvedValue([]),
+    };
+
+    const result = await listPlayers(
+      { query: "", page: 1, pageSize: 10, active: "true" },
+      db as never,
+    );
+
+    expect(result.players[0]?.isInjured).toBe(true);
+    expect(result.players[0]?.injuryLabel).toBe("OUT");
   });
 });
 

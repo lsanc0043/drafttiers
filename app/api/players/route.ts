@@ -12,6 +12,8 @@ export async function GET(request: Request) {
     pageSize: searchParams.get("pageSize") ?? undefined,
     active: searchParams.get("active") ?? undefined,
     team: searchParams.get("team") ?? undefined,
+    sort: searchParams.get("sort") ?? undefined,
+    scoring: searchParams.get("scoring") ?? undefined,
   });
 
   if (!parsed.success) {
