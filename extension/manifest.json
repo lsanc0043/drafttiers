@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "DraftTier",
+  "description": "DraftTier side panel for live NBA draft boards.",
+  "version": "0.0.1",
+  "action": {
+    "default_title": "Open DraftTier"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel"],
+  "host_permissions": ["http://localhost:3000/*", "https://*/*"]
+}
