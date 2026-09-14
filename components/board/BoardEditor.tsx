@@ -1,0 +1,642 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { BoardPlayerChip } from "@/components/board/BoardPlayerChip";
+import { DraftBoardCanvas } from "@/components/board/DraftBoardCanvas";
+import { DraftSettingsModal } from "@/components/board/DraftSettingsModal";
+import { TierModal } from "@/components/board/TierModal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { BucketColumn } from "@/components/buckets/BucketColumn";
+import { type PlayerCardData } from "@/components/players/PlayerCard";
+import { PlayerDirectory } from "@/components/players/PlayerDirectory";
+import { PlayerModal } from "@/components/players/PlayerModal";
+import { useFantasyScoring } from "@/hooks/useFantasyScoring";
+import { placeBoardPlayer, removeBoardPlayer, removeBoardPlayers, moveBoardPlayers, clearBoardPlayers } from "@/lib/board-players";
+import { nextAlternatingTierColor, type DraftSettingsInput } from "@/lib/validation";
+import type { BoardBucket, BoardBucketPlayer, BoardDetail } from "@/types";
+
+type BoardEditorProps = {
+  boardId: string;
+};
+
+function toBoardPlayer(player: PlayerCardData, existing?: BoardBucketPlayer): BoardBucketPlayer {
+  if (existing) {
+    return existing;
+  }
+  return {
+    assignmentId: `pending-${player.id}`,
+    playerId: player.id,
+    nbaPersonId: player.nbaPersonId,
+    fullName: player.fullName,
+    teamAbbr: player.teamAbbr,
+    teamName: player.teamName,
+    position: player.position,
+    jerseyNumber: player.jerseyNumber,
+    isActive: player.isActive,
+    sortOrder: 0,
+  };
+}
+
+function toPlayerCard(player: BoardBucketPlayer): PlayerCardData {
+  return {
+    id: player.playerId,
+    nbaPersonId: player.nbaPersonId,
+    fullName: player.fullName,
+    teamAbbr: player.teamAbbr,
+    teamName: player.teamName,
+    position: player.position,
+    jerseyNumber: player.jerseyNumber,
+    isActive: player.isActive,
+    isRookie: false,
+  };
+}
+
+export function BoardEditor({ boardId }: BoardEditorProps) {
+  const [board, setBoard] = useState<BoardDetail | null>(null);
+  const [title, setTitle] = useState("");
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tierModal, setTierModal] = useState<"create" | BoardBucket | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [browseOpen, setBrowseOpen] = useState(false);
+  const [selecting, setSelecting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerCardData | null>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const { scoring } = useFantasyScoring();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/boards/${boardId}`, { signal: controller.signal, cache: "no-store" })
+      .then(async (response) => {
+        if (response.status === 404) {
+          throw new Error("Board not found");
+        }
+        if (!response.ok) {
+          throw new Error("Could not load board");
+        }
+        const payload = (await response.json()) as { board: BoardDetail };
+        setBoard(payload.board);
+        setTitle(payload.board.name);
+        setError(null);
+      })
+      .catch((loadError: unknown) => {
+        if (loadError instanceof DOMException && loadError.name === "AbortError") {
+          return;
+        }
+        setError(loadError instanceof Error ? loadError.message : "Could not load board");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      });
+
+    return () => controller.abort();
+  }, [boardId]);
+
+  useEffect(() => {
+    if (editingTitle) {
+      titleInputRef.current?.focus();
+      titleInputRef.current?.select();
+    }
+  }, [editingTitle]);
+
+  async function saveTitle(nextName: string) {
+    const name = nextName.trim();
+    setEditingTitle(false);
+    if (!board || !name || name === board.name) {
+      setTitle(board?.name ?? "");
+      return;
+    }
+    const response = await fetch(`/api/boards/${board.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    if (!response.ok) {
+      setError("Could not rename board");
+      setTitle(board.name);
+      return;
+    }
+    const payload = (await response.json()) as { board: BoardDetail };
+    setBoard(payload.board);
+    setTitle(payload.board.name);
+    setError(null);
+  }
+
+  async function onSaveDraftSettings(settings: DraftSettingsInput) {
+    if (!board) {
+      return;
+    }
+    const response = await fetch(`/api/boards/${board.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ draftSettings: settings }),
+    });
+    if (!response.ok) {
+      throw new Error("Could not save draft settings");
+    }
+    const payload = (await response.json()) as { board: BoardDetail };
+    setBoard(payload.board);
+    setSettingsOpen(false);
+    setError(null);
+  }
+
+  async function onCreateTier(input: { name: string; color: string }) {
+    if (!board) {
+      return;
+    }
+    const response = await fetch(`/api/boards/${board.id}/buckets`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (!response.ok) {
+      throw new Error("Could not create tier");
+    }
+    const payload = (await response.json()) as { bucket: BoardBucket };
+    setBoard({ ...board, buckets: [...board.buckets, { ...payload.bucket, players: [] }] });
+    setTierModal(null);
+    setError(null);
+  }
+
+  async function onUpdateTier(bucket: BoardBucket, input: { name: string; color: string }) {
+    if (!board) {
+      return;
+    }
+    const response = await fetch(`/api/boards/${board.id}/buckets/${bucket.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (!response.ok) {
+      throw new Error("Could not update tier");
+    }
+    const payload = (await response.json()) as { bucket: BoardBucket };
+    setBoard({
+      ...board,
+      buckets: board.buckets.map((item) =>
+        item.id === payload.bucket.id ? { ...payload.bucket, players: item.players } : item,
+      ),
+    });
+    setTierModal(null);
+    setError(null);
+  }
+
+  async function onDeleteTier(bucketId: string) {
+    if (!board) {
+      return;
+    }
+    const response = await fetch(`/api/boards/${board.id}/buckets/${bucketId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setError("Could not delete tier");
+      return;
+    }
+    setBoard({
+      ...board,
+      buckets: board.buckets.filter((item) => item.id !== bucketId),
+    });
+    setSelectedIds((current) => {
+      const removed = new Set(
+        board.buckets.find((item) => item.id === bucketId)?.players.map((player) => player.playerId) ??
+          [],
+      );
+      return current.filter((id) => !removed.has(id));
+    });
+    setError(null);
+  }
+
+  async function onDropPlayer(
+    bucketId: string,
+    player: PlayerCardData,
+    beforePlayerId?: string,
+  ) {
+    if (!board || player.id === beforePlayerId) {
+      return;
+    }
+
+    const existing = board.buckets
+      .flatMap((bucket) => bucket.players)
+      .find((entry) => entry.playerId === player.id);
+    const previous = board;
+    const optimistic = toBoardPlayer(player, existing);
+    setBoard({
+      ...board,
+      buckets: placeBoardPlayer(board.buckets, optimistic, bucketId, beforePlayerId),
+    });
+
+    const response = await fetch(`/api/boards/${board.id}/players`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        playerId: player.id,
+        bucketId,
+        ...(beforePlayerId ? { beforePlayerId } : {}),
+      }),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not add player to tier");
+      return;
+    }
+    const payload = (await response.json()) as {
+      player: BoardBucketPlayer;
+      bucketId: string;
+    };
+    setBoard((current) =>
+      current
+        ? {
+            ...current,
+            buckets: placeBoardPlayer(
+              current.buckets,
+              payload.player,
+              payload.bucketId,
+              beforePlayerId,
+            ),
+          }
+        : current,
+    );
+    setError(null);
+  }
+
+  async function onRemovePlayer(playerId: string) {
+    if (!board) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: removeBoardPlayer(board.buckets, playerId) });
+    setSelectedPlayer((current) => (current?.id === playerId ? null : current));
+    setSelectedIds((current) => current.filter((id) => id !== playerId));
+    const response = await fetch(`/api/boards/${board.id}/players/${playerId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not remove player from board");
+      return;
+    }
+    setError(null);
+  }
+
+  async function onResetPlayers() {
+    if (!board) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: clearBoardPlayers(board.buckets) });
+    setSelectedPlayer(null);
+    setSelectedIds([]);
+    setSelecting(false);
+    const response = await fetch(`/api/boards/${board.id}/players`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      throw new Error("Could not reset board players");
+    }
+    setResetOpen(false);
+    setError(null);
+  }
+
+  async function onBulkPlayers(action: "move" | "unassign", bucketId?: string) {
+    if (!board || selectedIds.length === 0) {
+      return;
+    }
+    const previous = board;
+    const playerIds = selectedIds;
+    setBoard({
+      ...board,
+      buckets:
+        action === "unassign"
+          ? removeBoardPlayers(board.buckets, playerIds)
+          : moveBoardPlayers(board.buckets, playerIds, bucketId ?? ""),
+    });
+    setSelectedIds([]);
+    setSelectedPlayer((current) =>
+      current && playerIds.includes(current.id) ? null : current,
+    );
+    const response = await fetch(`/api/boards/${board.id}/players`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action,
+        playerIds,
+        ...(bucketId ? { bucketId } : {}),
+      }),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setSelectedIds(playerIds);
+      setError(action === "unassign" ? "Could not unassign players" : "Could not move players");
+      return;
+    }
+    setError(null);
+  }
+
+  if (loading) {
+    return <p className="text-sm text-zinc-500">Loading board...</p>;
+  }
+
+  if (!board) {
+    return <p className="text-sm text-red-600">{error ?? "Board not found"}</p>;
+  }
+
+  const boardPane = (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          {editingTitle ? (
+            <input
+              ref={titleInputRef}
+              value={title}
+              aria-label="Board name"
+              onChange={(event) => setTitle(event.target.value)}
+              onBlur={(event) => void saveTitle(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void saveTitle(event.currentTarget.value);
+                }
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  setTitle(board.name);
+                  setEditingTitle(false);
+                }
+              }}
+              className="min-w-0 flex-1 bg-transparent text-2xl font-semibold outline-none"
+            />
+          ) : (
+            <>
+              <h1 className="min-w-0 truncate text-2xl font-semibold">{board.name}</h1>
+              <button
+                type="button"
+                onClick={() => setEditingTitle(true)}
+                className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                aria-label="Edit board name"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                  <path
+                    d="M4 20h4L19.5 8.5a1.5 1.5 0 0 0 0-2.12L17.62 4.5a1.5 1.5 0 0 0-2.12 0L4 16v4z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </>
+          )}
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            className="rounded-md border border-zinc-300 px-2.5 py-1 text-sm whitespace-nowrap text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            Draft settings
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setBrowseOpen((open) => !open)}
+            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium dark:border-zinc-700"
+            aria-pressed={browseOpen}
+          >
+            {browseOpen ? "Hide players" : "Browse players"}
+          </button>
+          <button
+            type="button"
+            disabled={!selecting && !board.buckets.some((bucket) => bucket.players.length > 0)}
+            onClick={() => {
+              setSelecting((open) => {
+                if (open) {
+                  setSelectedIds([]);
+                }
+                return !open;
+              });
+            }}
+            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-zinc-700"
+            aria-pressed={selecting}
+          >
+            {selecting ? "Done selecting" : "Select"}
+          </button>
+          <button
+            type="button"
+            disabled={!board.buckets.some((bucket) => bucket.players.length > 0)}
+            onClick={() => setResetOpen(true)}
+            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-zinc-700"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingTitle(false);
+              setTierModal("create");
+            }}
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+          >
+            Create tier
+          </button>
+        </div>
+      </div>
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {board.draftSettings ? (
+        <p className="text-sm text-zinc-500">
+          {board.draftSettings.teamCount}-team {board.draftSettings.draftType.toLowerCase()} · pick{" "}
+          {board.draftSettings.draftPosition} · {board.draftSettings.roundCount} rounds ·{" "}
+          {board.draftSettings.roundTimerSeconds}s
+        </p>
+      ) : (
+        <p className="text-sm text-zinc-500">No draft settings yet.</p>
+      )}
+      {selecting ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800">
+          <p className="text-zinc-500">{selectedIds.length} selected</p>
+          <button
+            type="button"
+            onClick={() =>
+              setSelectedIds(
+                board.buckets.flatMap((bucket) => bucket.players.map((player) => player.playerId)),
+              )
+            }
+            className="rounded-md border border-zinc-300 px-3 py-1 dark:border-zinc-700"
+          >
+            Select all
+          </button>
+          <label className="flex items-center gap-2">
+            <span className="text-zinc-500">Move to</span>
+            <select
+              aria-label="Move selected players to tier"
+              disabled={selectedIds.length === 0}
+              defaultValue=""
+              onChange={(event) => {
+                const bucketId = event.target.value;
+                event.target.value = "";
+                if (bucketId) {
+                  void onBulkPlayers("move", bucketId);
+                }
+              }}
+              className="rounded-md border border-zinc-300 bg-background px-2 py-1 disabled:opacity-50 dark:border-zinc-700"
+            >
+              <option value="">Choose tier</option>
+              {board.buckets.map((bucket) => (
+                <option key={bucket.id} value={bucket.id}>
+                  {bucket.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            disabled={selectedIds.length === 0}
+            onClick={() => void onBulkPlayers("unassign")}
+            className="rounded-md border border-zinc-300 px-3 py-1 disabled:opacity-50 dark:border-zinc-700"
+          >
+            Unassign
+          </button>
+        </div>
+      ) : null}
+
+      <DraftBoardCanvas>
+        <div className="space-y-3">
+          {board.buckets.length === 0 ? (
+            <p className="text-sm text-zinc-500">No tiers yet. Create a tier to get started.</p>
+          ) : (
+            board.buckets.map((bucket, index) => (
+              <BucketColumn
+                key={bucket.id}
+                id={bucket.id}
+                name={bucket.name}
+                color={nextAlternatingTierColor(index)}
+                onEdit={() => {
+                  setEditingTitle(false);
+                  setTierModal(bucket);
+                }}
+                onDelete={() => void onDeleteTier(bucket.id)}
+                onDropPlayer={(player, beforePlayerId) =>
+                  void onDropPlayer(bucket.id, player, beforePlayerId)
+                }
+              >
+                {bucket.players.map((player) => (
+                  <BoardPlayerChip
+                    key={player.playerId}
+                    player={player}
+                    selecting={selecting}
+                    selected={selectedIds.includes(player.playerId)}
+                    onSelect={() => setSelectedPlayer(toPlayerCard(player))}
+                    onToggleSelect={() =>
+                      setSelectedIds((current) =>
+                        current.includes(player.playerId)
+                          ? current.filter((id) => id !== player.playerId)
+                          : [...current, player.playerId],
+                      )
+                    }
+                    onRemove={() => void onRemovePlayer(player.playerId)}
+                    onDropRelative={(dropped, side) => {
+                      if (side === "before") {
+                        void onDropPlayer(bucket.id, dropped, player.playerId);
+                        return;
+                      }
+                      const afterIndex = bucket.players.findIndex(
+                        (entry) => entry.playerId === player.playerId,
+                      );
+                      const next = bucket.players
+                        .slice(afterIndex + 1)
+                        .find((entry) => entry.playerId !== dropped.id);
+                      void onDropPlayer(bucket.id, dropped, next?.playerId);
+                    }}
+                  />
+                ))}
+              </BucketColumn>
+            ))
+          )}
+        </div>
+      </DraftBoardCanvas>
+    </div>
+  );
+
+  return (
+    <>
+      <div
+        className={
+          browseOpen
+            ? "flex h-[calc(100dvh-5.5rem)] min-h-0 gap-4"
+            : undefined
+        }
+      >
+        <div className={browseOpen ? "min-h-0 w-1/2 overflow-y-auto pr-1" : undefined}>
+          {boardPane}
+        </div>
+        {browseOpen ? (
+          <aside className="flex min-h-0 w-1/2 min-w-0 flex-col overflow-hidden border-l border-zinc-200 pl-4 dark:border-zinc-800">
+            <PlayerDirectory
+              variant="panel"
+              draggable
+              excludedPlayerIds={
+                new Set(
+                  board.buckets.flatMap((bucket) =>
+                    bucket.players.map((player) => player.playerId),
+                  ),
+                )
+              }
+            />
+          </aside>
+        ) : null}
+      </div>
+
+      {tierModal === "create" ? (
+        <TierModal
+          title="Create tier"
+          submitLabel="Create tier"
+          initialColor={nextAlternatingTierColor(board.buckets.length)}
+          onClose={() => setTierModal(null)}
+          onSave={onCreateTier}
+        />
+      ) : null}
+      {tierModal && tierModal !== "create" ? (
+        <TierModal
+          key={tierModal.id}
+          title="Edit tier"
+          submitLabel="Save tier"
+          initialName={tierModal.name}
+          initialColor={nextAlternatingTierColor(
+            board.buckets.findIndex((bucket) => bucket.id === tierModal.id),
+          )}
+          onClose={() => setTierModal(null)}
+          onSave={(input) => onUpdateTier(tierModal, input)}
+        />
+      ) : null}
+      {resetOpen ? (
+        <ConfirmModal
+          title="Reset assignments"
+          description="Remove every player from this board? Tiers stay in place, and you can drag players back from the directory."
+          confirmLabel="Reset board"
+          onClose={() => setResetOpen(false)}
+          onConfirm={onResetPlayers}
+        />
+      ) : null}
+      {settingsOpen ? (
+        <DraftSettingsModal
+          title="Draft settings"
+          submitLabel="Save settings"
+          initialSettings={board.draftSettings}
+          defaultScoring={board.draftSettings?.fantasyScoring ?? scoring}
+          onClose={() => setSettingsOpen(false)}
+          onSave={onSaveDraftSettings}
+        />
+      ) : null}
+      {selectedPlayer ? (
+        <PlayerModal
+          player={selectedPlayer}
+          scoring={board.draftSettings?.fantasyScoring ?? scoring}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      ) : null}
+    </>
+  );
+}

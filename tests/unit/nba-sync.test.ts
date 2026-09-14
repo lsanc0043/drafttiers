@@ -72,7 +72,8 @@ describe("player list query validation", () => {
     expect(parsed.pageSize).toBe(25);
     expect(parsed.query).toBe("");
     expect(parsed.active).toBe("true");
-    expect(parsed.sort).toBe("name");
+    expect(parsed.sort).toBe("fpts");
+    expect(parsed.rookies).toBe("false");
   });
 
   it("rejects an oversized page", () => {
@@ -207,7 +208,7 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "james", page: 2, pageSize: 10, active: "true", team: "LAL" },
+      { query: "james", page: 2, pageSize: 10, active: "true", team: "LAL", sort: "name" },
       db as never,
     );
 
@@ -252,11 +253,34 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "", page: 1, pageSize: 10, active: "true" },
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "name" },
       db as never,
     );
 
     expect(result.players[0]?.isRookie).toBe(true);
+  });
+
+  it("filters to current-year rookies", async () => {
+    const db = {
+      player: {
+        findMany: vi.fn().mockResolvedValue([{ ...lebron, fromYear: 2026 }]),
+        count: vi.fn().mockResolvedValue(1),
+      },
+      $queryRaw: vi.fn().mockResolvedValue([]),
+    };
+
+    await listPlayers(
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "name", rookies: "true" },
+      db as never,
+    );
+
+    expect(db.player.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          fromYear: 2026,
+        }),
+      }),
+    );
   });
 
   it("sorts by average 2025-26 fantasy points", async () => {
@@ -301,6 +325,48 @@ describe("listPlayers", () => {
     expect(result.players[0]?.avgFantasyPoints).toBe(30);
   });
 
+  it("sorts by 2025-26 scoring averages", async () => {
+    const db = {
+      player: {
+        findMany: vi.fn().mockResolvedValue([
+          { ...lebron, id: "low", lastName: "Low", firstName: "A", fromYear: 2003 },
+          { ...lebron, id: "high", nbaPersonId: 2, lastName: "High", firstName: "B", fromYear: 2003 },
+        ]),
+        count: vi.fn().mockResolvedValue(2),
+      },
+      $queryRaw: vi.fn().mockResolvedValue([
+        {
+          playerId: "high",
+          points: 12,
+          rebounds: 0,
+          assists: 0,
+          steals: 0,
+          blocks: 0,
+          turnovers: 0,
+          threePointersMade: 0,
+        },
+        {
+          playerId: "low",
+          points: 4,
+          rebounds: 0,
+          assists: 0,
+          steals: 0,
+          blocks: 0,
+          turnovers: 0,
+          threePointersMade: 0,
+        },
+      ]),
+    };
+
+    const result = await listPlayers(
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "pts" },
+      db as never,
+    );
+
+    expect(result.players.map((player) => player.id)).toEqual(["high", "low"]);
+    expect(result.players[0]?.avgPoints).toBe(12);
+  });
+
   it("marks injured players from the ESPN injury feed", async () => {
     vi.stubGlobal(
       "fetch",
@@ -333,7 +399,7 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "", page: 1, pageSize: 10, active: "true" },
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "name" },
       db as never,
     );
 

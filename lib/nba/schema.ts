@@ -28,8 +28,13 @@ export const playerListQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(100).default(25),
   active: z.enum(["true", "false", "all"]).optional().default("true"),
   team: z.string().trim().max(40).optional(),
-  sort: z.enum(["name", "fantasy"]).optional().default("name"),
+  sort: z
+    .enum(["name", "fantasy", "fpts", "pts", "reb", "ast", "stl", "blk", "tov", "usg", "pra", "ra", "stocks"])
+    .optional()
+    .default("fpts"),
+  sortDir: z.enum(["asc", "desc"]).optional(),
   scoring: z.string().max(4000).optional(),
+  rookies: z.enum(["true", "false"]).optional().default("false"),
 });
 
 export type NbaPlayerInput = z.infer<typeof nbaPlayerSchema>;
@@ -79,6 +84,10 @@ export const nbaTeamGameSchema = z.object({
   gameId: z.string().trim().min(1).max(32),
   gameDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   season: z.string().min(4).max(16),
+  minutes: z.number().nonnegative().optional().nullable(),
+  fieldGoalsAttempted: z.number().int().nonnegative().optional().nullable(),
+  freeThrowsAttempted: z.number().int().nonnegative().optional().nullable(),
+  turnovers: z.number().int().nonnegative().optional().nullable(),
 });
 
 export const nbaStatsBundleSchema = z.object({

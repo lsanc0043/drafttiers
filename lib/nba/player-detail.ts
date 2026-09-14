@@ -3,7 +3,9 @@ import { prisma } from "@/lib/db/prisma";
 import { gameLogBucket, mergeSeasonGameLog } from "@/lib/nba/game-log";
 import { scoreFantasyGame } from "@/lib/nba/fantasy";
 import { getInjuryIndex, getPlayerInjury } from "@/lib/nba/injuries";
+import { teamUsageMap, teamUsageTotals } from "@/lib/nba/players";
 import { FANTASY_AVERAGE_SEASON, gameLogDateRange, isRookieForLeagueYear } from "@/lib/nba/season";
+import { usageRateFromPerGame } from "@/lib/nba/usage";
 
 type SeasonStatRow = {
   season: string;
@@ -62,7 +64,7 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
   const { start: seasonStart, end: seasonEnd } = gameLogDateRange();
   const teamId = "teamId" in player ? (player.teamId as number | null) : null;
 
-  const [seasonStats, seasonGames, teamGames, injuries] = await Promise.all([
+  const [seasonStats, seasonGames, teamGames, teamUsage, injuries] = await Promise.all([
     db.$queryRaw<SeasonStatRow[]>`
       SELECT
         "season",
@@ -147,10 +149,25 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
         AND tg."gameDate" < ${seasonEnd}
       ORDER BY tg."gameId", tg_opp."teamAbbr", opp_p."teamAbbr"
     `,
+    teamUsageTotals(db, FANTASY_AVERAGE_SEASON),
     getInjuryIndex(),
   ]);
 
   const latestSeason = seasonStats[0] ?? null;
+  const teamBox = teamId != null ? teamUsageMap(teamUsage).get(teamId) : undefined;
+  const usageRateValue =
+    latestSeason && teamBox
+      ? usageRateFromPerGame(
+          {
+            fieldGoalsAttempted: Number(latestSeason.fieldGoalsAttempted),
+            freeThrowsAttempted: Number(latestSeason.freeThrowsAttempted),
+            turnovers: Number(latestSeason.turnovers),
+            minutes: Number(latestSeason.minutes),
+          },
+          teamBox,
+          latestSeason.gamesPlayed,
+        )
+      : null;
   const injury = getPlayerInjury(player, injuries);
   const playedGames = seasonGames.map((game) => ({ ...serializeGame(game), didNotPlay: false }));
   const gameLog = mergeSeasonGameLog(
@@ -201,6 +218,7 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
           threePointersAttempted: Number(latestSeason.threePointersAttempted),
           freeThrowsMade: Number(latestSeason.freeThrowsMade),
           freeThrowsAttempted: Number(latestSeason.freeThrowsAttempted),
+          usageRate: usageRateValue,
         }
       : null,
     recentGames: gameLog,

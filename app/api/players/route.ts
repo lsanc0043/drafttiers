@@ -13,7 +13,9 @@ export async function GET(request: Request) {
     active: searchParams.get("active") ?? undefined,
     team: searchParams.get("team") ?? undefined,
     sort: searchParams.get("sort") ?? undefined,
+    sortDir: searchParams.get("sortDir") ?? undefined,
     scoring: searchParams.get("scoring") ?? undefined,
+    rookies: searchParams.get("rookies") ?? undefined,
   });
 
   if (!parsed.success) {

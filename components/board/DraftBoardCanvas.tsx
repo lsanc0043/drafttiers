@@ -1,6 +1,5 @@
 "use client";
 
-import { DndContext } from "@dnd-kit/core";
 import type { ReactNode } from "react";
 
 type DraftBoardCanvasProps = {
@@ -9,12 +8,10 @@ type DraftBoardCanvasProps = {
 
 export function DraftBoardCanvas({ children }: DraftBoardCanvasProps) {
   return (
-    <DndContext>
-      <section className="min-h-[12rem] rounded-xl border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-        {children ?? (
-          <p className="text-sm text-zinc-500">Draft board canvas placeholder</p>
-        )}
-      </section>
-    </DndContext>
+    <section className="min-h-[12rem] rounded-xl border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
+      {children ?? (
+        <p className="text-sm text-zinc-500">Draft board canvas placeholder</p>
+      )}
+    </section>
   );
 }

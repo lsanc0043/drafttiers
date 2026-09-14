@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { createBoard, listBoards } from "@/lib/boards";
 import { createBoardSchema } from "@/lib/validation";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
-  return NextResponse.json({ boards: [] });
+  const boards = await listBoards();
+  return NextResponse.json({ boards });
 }
 
 export async function POST(request: Request) {
@@ -13,8 +17,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  return NextResponse.json(
-    { message: "Board persistence is not implemented yet", input: parsed.data },
-    { status: 501 },
-  );
+  const board = await createBoard(parsed.data);
+  return NextResponse.json({ board }, { status: 201 });
 }
