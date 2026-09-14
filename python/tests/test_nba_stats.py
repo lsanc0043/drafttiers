@@ -102,6 +102,10 @@ def test_normalize_team_game():
             "TEAM_ABBREVIATION": "MIA",
             "GAME_ID": "0022500100",
             "GAME_DATE": "2026-01-15",
+            "MIN": 240,
+            "FGA": 88,
+            "FTA": 22,
+            "TOV": 14,
         },
         "2025-26",
     )
@@ -111,6 +115,10 @@ def test_normalize_team_game():
         "gameId": "0022500100",
         "gameDate": "2026-01-15",
         "season": "2025-26",
+        "minutes": 240.0,
+        "fieldGoalsAttempted": 88,
+        "freeThrowsAttempted": 22,
+        "turnovers": 14,
     }
 
 

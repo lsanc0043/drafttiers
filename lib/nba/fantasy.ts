@@ -66,6 +66,24 @@ export function tenCategoryCount(box: FantasyBoxScore) {
   return TEN_CAT_KEYS.filter((key) => box[key] >= 10).length;
 }
 
+export function scoringToForm(scoring: FantasyScoring): Record<keyof FantasyScoring, string> {
+  return {
+    points: String(scoring.points),
+    rebounds: String(scoring.rebounds),
+    assists: String(scoring.assists),
+    blocks: String(scoring.blocks),
+    steals: String(scoring.steals),
+    doubleDouble: String(scoring.doubleDouble),
+    turnover: String(scoring.turnover),
+    threePointer: String(scoring.threePointer),
+    tripleDouble: String(scoring.tripleDouble),
+    technical: String(scoring.technical),
+    flagrant: String(scoring.flagrant),
+    points40: String(scoring.points40),
+    points50: String(scoring.points50),
+  };
+}
+
 export function parseFantasyScoring(value: unknown): FantasyScoring {
   if (!value || typeof value !== "object") {
     return { ...DEFAULT_FANTASY_SCORING };

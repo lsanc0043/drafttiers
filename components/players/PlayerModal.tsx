@@ -51,6 +51,7 @@ type PlayerDetailResponse = {
     steals: number;
     blocks: number;
     turnovers: number;
+    usageRate?: number | null;
   } | null;
   recentGames: Array<GameLogRow>;
   gameLog?: Array<GameLogRow>;
@@ -231,7 +232,7 @@ export function PlayerModal({
   const hasPlayedGames = allGames.some((game) => !game.didNotPlay);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
+    <div className="fixed inset-0 z-60 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
       <button
         type="button"
         className="absolute inset-0 bg-black/60"
@@ -319,6 +320,10 @@ export function PlayerModal({
                     { label: "BLK", value: formatStat(season?.blocks) },
                     { label: "TOV", value: formatStat(season?.turnovers) },
                     {
+                      label: "USG%",
+                      value: formatStat(season?.usageRate),
+                    },
+                    {
                       label: "FPTS",
                       value:
                         seasonFantasyAverage == null
@@ -400,7 +405,7 @@ export function PlayerModal({
               </p>
             ) : seasonGames.length ? (
               <div className="mt-2 overflow-x-auto md:min-h-0 md:flex-1 md:overflow-auto">
-                <table className="w-full min-w-[32rem] text-left text-sm">
+                <table className="w-full min-w-lg text-left text-sm">
                   <thead className="sticky top-0 bg-background text-zinc-300">
                     <tr>
                       {[
@@ -444,7 +449,10 @@ export function PlayerModal({
                           }
                         >
                           <td className="py-2 pr-2 whitespace-nowrap">
-                            {formatGameLogMatchup(game.gameDate, game.opponentAbbr)}
+                            {formatGameLogMatchup(
+                              game.gameDate,
+                              game.opponentAbbr,
+                            )}
                           </td>
                           {[
                             formatStat(game.minutes, 0),

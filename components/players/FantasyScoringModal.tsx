@@ -5,6 +5,7 @@ import {
   DEFAULT_FANTASY_SCORING,
   FANTASY_SCORING_FIELDS,
   parseFantasyScoring,
+  scoringToForm,
   type FantasyScoring,
 } from "@/lib/nba/fantasy";
 
@@ -14,26 +15,8 @@ type FantasyScoringModalProps = {
   onClose: () => void;
 };
 
-function scoringToDraft(scoring: FantasyScoring): Record<keyof FantasyScoring, string> {
-  return {
-    points: String(scoring.points),
-    rebounds: String(scoring.rebounds),
-    assists: String(scoring.assists),
-    blocks: String(scoring.blocks),
-    steals: String(scoring.steals),
-    doubleDouble: String(scoring.doubleDouble),
-    turnover: String(scoring.turnover),
-    threePointer: String(scoring.threePointer),
-    tripleDouble: String(scoring.tripleDouble),
-    technical: String(scoring.technical),
-    flagrant: String(scoring.flagrant),
-    points40: String(scoring.points40),
-    points50: String(scoring.points50),
-  };
-}
-
 export function FantasyScoringModal({ scoring, onSave, onClose }: FantasyScoringModalProps) {
-  const [draft, setDraft] = useState(scoringToDraft(scoring));
+  const [draft, setDraft] = useState(scoringToForm(scoring));
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -117,7 +100,7 @@ export function FantasyScoringModal({ scoring, onSave, onClose }: FantasyScoring
             </button>
             <button
               type="button"
-              onClick={() => setDraft(scoringToDraft(DEFAULT_FANTASY_SCORING))}
+              onClick={() => setDraft(scoringToForm(DEFAULT_FANTASY_SCORING))}
               className="rounded-md border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700"
             >
               Reset defaults

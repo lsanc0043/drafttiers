@@ -156,13 +156,19 @@ export async function persistTeamGames(db: PrismaClient, games: NbaTeamGameInput
     const values = group.map((row) => teamGameInsertValues(row, now));
     await db.$executeRaw`
       INSERT INTO "TeamGame" (
-        "id", "teamId", "teamAbbr", "gameId", "gameDate", "season", "createdAt", "updatedAt"
+        "id", "teamId", "teamAbbr", "gameId", "gameDate", "season",
+        "minutes", "fieldGoalsAttempted", "freeThrowsAttempted", "turnovers",
+        "createdAt", "updatedAt"
       )
       VALUES ${PrismaSql.join(values)}
       ON CONFLICT ("teamId", "gameId") DO UPDATE SET
         "teamAbbr" = EXCLUDED."teamAbbr",
         "gameDate" = EXCLUDED."gameDate",
         "season" = EXCLUDED."season",
+        "minutes" = EXCLUDED."minutes",
+        "fieldGoalsAttempted" = EXCLUDED."fieldGoalsAttempted",
+        "freeThrowsAttempted" = EXCLUDED."freeThrowsAttempted",
+        "turnovers" = EXCLUDED."turnovers",
         "updatedAt" = EXCLUDED."updatedAt"
     `;
   }
@@ -176,6 +182,10 @@ function teamGameInsertValues(row: NbaTeamGameInput, now: Date) {
     ${row.gameId},
     ${new Date(`${row.gameDate}T00:00:00.000Z`)},
     ${row.season},
+    ${row.minutes ?? null},
+    ${row.fieldGoalsAttempted ?? null},
+    ${row.freeThrowsAttempted ?? null},
+    ${row.turnovers ?? null},
     ${now},
     ${now}
   )`;

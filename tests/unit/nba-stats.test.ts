@@ -257,6 +257,17 @@ describe("GET player detail", () => {
       },
       $queryRaw: vi.fn(async (...args: unknown[]) => {
         const sql = JSON.stringify(args);
+        if (sql.includes("usageMp")) {
+          return [
+            {
+              teamId: 1610612747,
+              usageMp: 240 * 65,
+              usageFga: 90 * 65,
+              usageFta: 22 * 65,
+              usageTov: 14 * 65,
+            },
+          ];
+        }
         if (sql.includes("PlayerSeasonStats")) {
           return [{ ...seasonRow, playerId: "player-1" }];
         }
@@ -306,6 +317,13 @@ describe("GET player detail", () => {
 
     expect(detail?.player.fullName).toBe("LeBron James");
     expect(detail?.seasonStats?.points).toBe(25.4);
+    expect(detail?.seasonStats?.usageRate).toBeCloseTo(
+      (100 *
+        (18.2 + 0.44 * 6.4 + 3.2) *
+        65 *
+        ((240 * 65) / 5)) /
+        (35.4 * 65 * (90 * 65 + 0.44 * 22 * 65 + 14 * 65)),
+    );
     expect(detail?.recentGames).toHaveLength(3);
     expect(detail?.gameLog.some((game) => game.didNotPlay)).toBe(true);
     expect(detail?.seasonFantasy.gamesPlayed).toBe(2);

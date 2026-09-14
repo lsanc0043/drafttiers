@@ -178,6 +178,10 @@ def normalize_team_game(row: Mapping[str, Any], season: str) -> dict[str, Any] |
         "gameId": game_id,
         "gameDate": game_date,
         "season": season,
+        "minutes": parse_minutes(row.get("MIN")),
+        "fieldGoalsAttempted": _as_count(row.get("FGA")),
+        "freeThrowsAttempted": _as_count(row.get("FTA")),
+        "turnovers": _as_count(row.get("TOV")),
     }
 
 

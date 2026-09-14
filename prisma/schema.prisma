@@ -13,6 +13,12 @@ enum BoardVisibility {
   SHARED
 }
 
+enum DraftType {
+  SNAKE
+  LINEAR
+  CUSTOM
+}
+
 enum NbaSyncStatus {
   IDLE
   RUNNING
@@ -31,16 +37,22 @@ model User {
 }
 
 model Board {
-  id            String         @id @default(cuid())
-  name          String
-  ownerId       String?
-  owner         User?          @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  visibility    BoardVisibility @default(PRIVATE)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  buckets       Bucket[]
-  assignments   BoardPlayer[]
-  sleeperDrafts SleeperDraft[]
+  id                 String          @id @default(cuid())
+  name               String
+  ownerId            String?
+  owner              User?           @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  visibility         BoardVisibility @default(PRIVATE)
+  teamCount          Int?
+  draftPosition      Int?
+  roundCount         Int?
+  draftType          DraftType?
+  roundTimerSeconds  Int?
+  fantasyScoring     Json?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  buckets            Bucket[]
+  assignments        BoardPlayer[]
+  sleeperDrafts      SleeperDraft[]
 
   @@index([ownerId])
 }
@@ -50,6 +62,7 @@ model Bucket {
   boardId   String
   board     Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
   name      String
+  color     String        @default("#71717a")
   sortOrder Int
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -152,14 +165,18 @@ model PlayerGameLog {
 }
 
 model TeamGame {
-  id        String   @id @default(cuid())
-  teamId    Int
-  teamAbbr  String
-  gameId    String
-  gameDate  DateTime
-  season    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  teamId                Int
+  teamAbbr              String
+  gameId                String
+  gameDate              DateTime
+  season                String
+  minutes               Float?
+  fieldGoalsAttempted   Int?
+  freeThrowsAttempted   Int?
+  turnovers             Int?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   @@unique([teamId, gameId])
   @@index([teamId, season, gameDate])

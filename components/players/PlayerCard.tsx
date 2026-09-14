@@ -13,6 +13,13 @@ export type PlayerCardData = {
   isActive: boolean;
   isRookie: boolean;
   avgFantasyPoints?: number | null;
+  avgPoints?: number | null;
+  avgRebounds?: number | null;
+  avgAssists?: number | null;
+  avgSteals?: number | null;
+  avgBlocks?: number | null;
+  avgTurnovers?: number | null;
+  avgUsageRate?: number | null;
   isInjured?: boolean;
   injuryLabel?: "GTD" | "OUT" | null;
   injuryUrl?: string | null;
@@ -90,28 +97,63 @@ function TeamPosition({
   );
 }
 
+export const CATALOG_PLAYER_DRAG_TYPE = "application/x-drafttiers-player";
+
+let draggingPlayer: PlayerCardData | null = null;
+
+export function setDraggingPlayer(player: PlayerCardData | null) {
+  draggingPlayer = player;
+}
+
+export function peekDraggingPlayer() {
+  return draggingPlayer;
+}
+
+export function takeDraggingPlayer() {
+  const player = draggingPlayer;
+  draggingPlayer = null;
+  return player;
+}
+
 type PlayerCardProps = {
   player: PlayerCardData;
   onSelect: (player: PlayerCardData) => void;
+  draggable?: boolean;
+  photoSize?: number;
 };
 
-export function PlayerCard({ player, onSelect }: PlayerCardProps) {
+export function PlayerCard({ player, onSelect, draggable = false, photoSize }: PlayerCardProps) {
   const team = player.teamAbbr ?? player.teamName ?? "FA";
   const position = player.position ?? "—";
+  const compact = photoSize != null && photoSize < 80;
 
   return (
     <button
       type="button"
+      draggable={draggable}
       onClick={() => onSelect(player)}
-      className="relative flex w-full flex-col items-center rounded-xl border border-zinc-200 bg-background px-3 py-4 text-center transition duration-200 hover:-translate-y-1 hover:border-zinc-400 hover:shadow-lg dark:border-zinc-800 dark:hover:border-zinc-500"
+      onDragStart={
+        draggable
+          ? (event) => {
+              draggingPlayer = player;
+              event.dataTransfer.setData(CATALOG_PLAYER_DRAG_TYPE, JSON.stringify(player));
+              event.dataTransfer.setData("text/plain", JSON.stringify(player));
+              event.dataTransfer.effectAllowed = "move";
+            }
+          : undefined
+      }
+      className={`relative flex w-full flex-col items-center rounded-xl border border-zinc-200 bg-background text-center transition duration-200 hover:-translate-y-1 hover:border-zinc-400 hover:shadow-lg dark:border-zinc-800 dark:hover:border-zinc-500 ${
+        compact ? "px-2 py-3" : "px-3 py-4"
+      }`}
     >
       {player.isInjured ? <InjuryBadge label={player.injuryLabel} /> : null}
       <PlayerPhoto
         nbaPersonId={player.nbaPersonId}
         fullName={player.fullName}
-        size="card"
+        size={photoSize != null ? "compact" : "card"}
+        photoSize={photoSize}
       />
-      <p className="mt-3 w-full truncate text-sm font-semibold">
+      <p className={`mt-3 w-full truncate font-semibold ${compact ? "text-xs" : "text-sm"}`}>
         {player.fullName.toLocaleUpperCase()}
       </p>
       <TeamPosition
