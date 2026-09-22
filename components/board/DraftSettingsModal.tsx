@@ -7,6 +7,15 @@ import {
   type FantasyScoring,
 } from "@/lib/nba/fantasy";
 import { draftSettingsSchema, type DraftSettingsInput } from "@/lib/validation";
+import { parseSleeperId } from "@/lib/sleeper/ids";
+
+type SleeperImportResponse = {
+  sleeperDraftId?: string;
+  leagueName?: string | null;
+  sport?: string | null;
+  settings: DraftSettingsInput;
+  error?: string;
+};
 
 type DraftSettingsModalProps = {
   title: string;
@@ -40,6 +49,7 @@ export function DraftSettingsModal({
   const roundCountId = useId();
   const draftTypeId = useId();
   const timerId = useId();
+  const sleeperId = useId();
   const [teamCount, setTeamCount] = useState(emptyNumber(initialSettings?.teamCount));
   const [draftPosition, setDraftPosition] = useState(emptyNumber(initialSettings?.draftPosition));
   const [roundCount, setRoundCount] = useState(emptyNumber(initialSettings?.roundCount));
@@ -52,8 +62,61 @@ export function DraftSettingsModal({
   const [scoring, setScoring] = useState(
     scoringToForm(initialSettings?.fantasyScoring ?? defaultScoring),
   );
+  const [sleeperDraftId, setSleeperDraftId] = useState(initialSettings?.sleeperDraftId ?? "");
+  const [importing, setImporting] = useState(false);
+  const [importNote, setImportNote] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function applyImportedSettings(settings: DraftSettingsInput) {
+    setTeamCount(String(settings.teamCount));
+    setDraftPosition(String(settings.draftPosition));
+    setRoundCount(String(settings.roundCount));
+    setDraftType(settings.draftType);
+    setRoundTimerSeconds(String(settings.roundTimerSeconds));
+    setScoring(scoringToForm(settings.fantasyScoring));
+  }
+
+  async function importFromSleeper() {
+    const pasted = sleeperDraftId.trim();
+    if (!pasted) {
+      setError("Paste a Sleeper draft ID first.");
+      return;
+    }
+
+    setImporting(true);
+    setError(null);
+    setImportNote(null);
+    try {
+      const response = await fetch("/api/sleeper/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sleeperDraftId: pasted }),
+      });
+      const payload = (await response.json()) as SleeperImportResponse;
+      if (!response.ok || !payload.settings) {
+        throw new Error(
+          typeof payload.error === "string" ? payload.error : "Could not load Sleeper draft",
+        );
+      }
+      applyImportedSettings(payload.settings);
+      if (payload.sleeperDraftId) {
+        setSleeperDraftId(payload.sleeperDraftId);
+      }
+      const leagueLabel = payload.leagueName ? ` from ${payload.leagueName}` : "";
+      const sportNote =
+        payload.sport && payload.sport.toLowerCase() !== "nba"
+          ? ` This Sleeper league is ${payload.sport}.`
+          : "";
+      setImportNote(
+        `Loaded draft and scoring${leagueLabel}. Confirm your draft slot.${sportNote}`,
+      );
+    } catch (importError) {
+      setError(importError instanceof Error ? importError.message : "Could not load Sleeper draft");
+    } finally {
+      setImporting(false);
+    }
+  }
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -71,6 +134,7 @@ export function DraftSettingsModal({
     const parsedScoring = Object.fromEntries(
       Object.entries(scoring).map(([key, value]) => [key, Number(value)]),
     );
+    const importedId = parseSleeperId(sleeperDraftId);
     const parsed = draftSettingsSchema.safeParse({
       teamCount: Number(teamCount),
       draftPosition: Number(draftPosition),
@@ -78,6 +142,7 @@ export function DraftSettingsModal({
       draftType,
       roundTimerSeconds: Number(roundTimerSeconds),
       fantasyScoring: parsedScoring,
+      ...(importedId ? { sleeperDraftId: importedId } : {}),
     });
     if (!parsed.success) {
       const first = parsed.error.issues[0];
@@ -141,6 +206,33 @@ export function DraftSettingsModal({
             ? "Set up your league if you have a draft ready. You can skip this and fill it in later."
             : "All fields are required to save these settings."}
         </p>
+
+        <div className="mt-4 rounded-xl border border-zinc-200 p-3 dark:border-zinc-800">
+          <label htmlFor={sleeperId} className="block text-sm">
+            <span className="font-medium">Sleeper draft ID</span>
+            <span className="mt-0.5 block text-xs text-zinc-500">
+              Paste a draft ID or Sleeper URL to fill teams, rounds, timer, and scoring.
+            </span>
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <input
+                id={sleeperId}
+                value={sleeperDraftId}
+                onChange={(event) => setSleeperDraftId(event.target.value)}
+                placeholder="123456789012345678"
+                className="w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+              />
+              <button
+                type="button"
+                disabled={importing || saving}
+                onClick={() => void importFromSleeper()}
+                className="shrink-0 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+              >
+                {importing ? "Fetching..." : "Fetch from Sleeper"}
+              </button>
+            </div>
+          </label>
+          {importNote ? <p className="mt-2 text-xs text-zinc-500">{importNote}</p> : null}
+        </div>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label htmlFor={teamCountId} className="block text-sm">

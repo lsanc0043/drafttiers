@@ -38,6 +38,7 @@ export type BoardDetail = {
   visibility: "PRIVATE" | "SHARED";
   createdAt: string;
   updatedAt: string;
+  sleeperDraftId: string | null;
   draftSettings: DraftSettings | null;
   buckets: BoardBucket[];
 };

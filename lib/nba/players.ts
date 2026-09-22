@@ -118,6 +118,17 @@ function sortMetric(averages: SeasonAverages | undefined, sort: Exclude<PlayerLi
   return averages.stl + averages.blk;
 }
 
+export async function listPlayerNamePositions(db: PrismaClient = prisma) {
+  return db.player.findMany({
+    select: {
+      id: true,
+      fullName: true,
+      position: true,
+    },
+    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+  });
+}
+
 export async function listPlayers(query: PlayerListQuery, db: PrismaClient = prisma) {
   const where: Prisma.PlayerWhereInput = {};
   const filters: Prisma.PlayerWhereInput[] = [];
