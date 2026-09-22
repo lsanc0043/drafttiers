@@ -18,6 +18,7 @@ const lebron = {
   teamName: "Los Angeles Lakers",
   position: "F",
   jerseyNumber: "23",
+  fromYear: null,
   isActive: true,
 };
 
@@ -208,7 +209,15 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "james", page: 2, pageSize: 10, active: "true", team: "LAL", sort: "name" },
+      {
+        query: "james",
+        page: 2,
+        pageSize: 10,
+        active: "true",
+        team: "LAL",
+        sort: "name",
+        rookies: "false",
+      },
       db as never,
     );
 
@@ -253,7 +262,7 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "", page: 1, pageSize: 10, active: "true", sort: "name" },
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "name", rookies: "false" },
       db as never,
     );
 
@@ -317,7 +326,7 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "", page: 1, pageSize: 10, active: "true", sort: "fantasy" },
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "fantasy", rookies: "false" },
       db as never,
     );
 
@@ -359,7 +368,7 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "", page: 1, pageSize: 10, active: "true", sort: "pts" },
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "pts", rookies: "false" },
       db as never,
     );
 
@@ -399,7 +408,7 @@ describe("listPlayers", () => {
     };
 
     const result = await listPlayers(
-      { query: "", page: 1, pageSize: 10, active: "true", sort: "name" },
+      { query: "", page: 1, pageSize: 10, active: "true", sort: "name", rookies: "false" },
       db as never,
     );
 

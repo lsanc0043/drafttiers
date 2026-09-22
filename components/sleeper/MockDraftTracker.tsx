@@ -209,9 +209,9 @@ export function MockDraftTracker() {
             playerId: pick.playerId,
             label: playerLabel(pick),
             positions:
-              meta.fantasyPositions.length > 0
+              (meta.fantasyPositions.length > 0
                 ? meta.fantasyPositions
-                : meta.position || mapped?.position,
+                : meta.position || mapped?.position) ?? null,
           };
         }),
       ),

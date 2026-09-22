@@ -230,7 +230,14 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
         fantasySeasonGames.length === 0
           ? null
           : fantasySeasonGames.reduce(
-              (sum, game) => sum + scoreFantasyGame(toBox(game)).fantasyPoints,
+              (sum, game) =>
+                sum +
+                scoreFantasyGame(
+                  toBox({
+                    ...game,
+                    gameDate: new Date(game.gameDate),
+                  }),
+                ).fantasyPoints,
               0,
             ) / fantasySeasonGames.length,
       games: fantasySeasonGames,
