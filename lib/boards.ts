@@ -24,6 +24,7 @@ type BoardRecord = {
   draftType?: "SNAKE" | "LINEAR" | "CUSTOM" | null;
   roundTimerSeconds?: number | null;
   fantasyScoring?: unknown;
+  sleeperDraftId?: string | null;
   buckets: Array<{
     id: string;
     name: string;
@@ -96,6 +97,7 @@ function serializeDraftSettings(board: Omit<BoardRecord, "buckets">): DraftSetti
     draftType: board.draftType,
     roundTimerSeconds: board.roundTimerSeconds,
     fantasyScoring: parseFantasyScoring(board.fantasyScoring),
+    ...(board.sleeperDraftId ? { sleeperDraftId: board.sleeperDraftId } : {}),
   };
 }
 
@@ -132,6 +134,38 @@ async function saveDraftSettings(
         "updatedAt" = ${now}
     WHERE id = ${boardId}
   `;
+}
+
+async function saveLinkedSleeperDraft(
+  boardId: string,
+  sleeperDraftId: string | null | undefined,
+  db: PrismaClient,
+) {
+  if (!sleeperDraftId) {
+    return;
+  }
+  try {
+    await db.sleeperDraft.upsert({
+      where: { sleeperDraftId },
+      create: { boardId, sleeperDraftId },
+      update: { boardId },
+    });
+  } catch {
+    // Linking is optional; the client also keeps the draft ID locally.
+  }
+}
+
+async function loadLinkedSleeperDraftId(boardId: string, db: PrismaClient) {
+  try {
+    const linked = await db.sleeperDraft.findFirst({
+      where: { boardId },
+      select: { sleeperDraftId: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    return linked?.sleeperDraftId ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function loadBoardRow(boardId: string, db: PrismaClient) {
@@ -177,6 +211,7 @@ function serializeBoard(
     visibility: board.visibility,
     createdAt: board.createdAt.toISOString(),
     updatedAt: board.updatedAt.toISOString(),
+    sleeperDraftId: board.sleeperDraftId ?? null,
     draftSettings: serializeDraftSettings(board),
     buckets: [...board.buckets]
       .sort((left, right) => left.sortOrder - right.sortOrder)
@@ -241,11 +276,12 @@ export async function getBoard(id: string, db: PrismaClient = prisma) {
   if (!board) {
     return null;
   }
-  const [buckets, assignments] = await Promise.all([
+  const [buckets, assignments, sleeperDraftId] = await Promise.all([
     loadBuckets(board.id, db),
     loadAssignments(board.id, db),
+    loadLinkedSleeperDraftId(board.id, db),
   ]);
-  return serializeBoard({ ...board, buckets }, assignments);
+  return serializeBoard({ ...board, buckets, sleeperDraftId }, assignments);
 }
 
 export async function createBoard(input: CreateBoardInput, db: PrismaClient = prisma) {
@@ -258,11 +294,13 @@ export async function createBoard(input: CreateBoardInput, db: PrismaClient = pr
 
   if (input.draftSettings) {
     await saveDraftSettings(board.id, input.draftSettings, db);
+    await saveLinkedSleeperDraft(board.id, input.draftSettings.sleeperDraftId, db);
   }
 
   return serializeBoard({
     ...board,
     ...draftSettingsOnBoard(input.draftSettings),
+    sleeperDraftId: input.draftSettings?.sleeperDraftId ?? null,
     buckets: [],
   });
 }
@@ -288,6 +326,10 @@ export async function updateBoard(
   }
   if (input.draftSettings !== undefined) {
     await saveDraftSettings(id, input.draftSettings, db);
+    await saveLinkedSleeperDraft(id, input.draftSettings?.sleeperDraftId, db);
+  }
+  if (input.sleeperDraftId !== undefined) {
+    await saveLinkedSleeperDraft(id, input.sleeperDraftId, db);
   }
 
   return getBoard(id, db);

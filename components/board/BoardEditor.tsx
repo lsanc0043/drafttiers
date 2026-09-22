@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { BoardPlayerChip } from "@/components/board/BoardPlayerChip";
 import { DraftBoardCanvas } from "@/components/board/DraftBoardCanvas";
 import { DraftSettingsModal } from "@/components/board/DraftSettingsModal";
+import { SleeperLiveTrackingBar } from "@/components/board/SleeperLiveTrackingBar";
 import { TierModal } from "@/components/board/TierModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BucketColumn } from "@/components/buckets/BucketColumn";
@@ -11,6 +12,7 @@ import { type PlayerCardData } from "@/components/players/PlayerCard";
 import { PlayerDirectory } from "@/components/players/PlayerDirectory";
 import { PlayerModal } from "@/components/players/PlayerModal";
 import { useFantasyScoring } from "@/hooks/useFantasyScoring";
+import { useSleeperLivePicks } from "@/hooks/useSleeperLivePicks";
 import { placeBoardPlayer, removeBoardPlayer, removeBoardPlayers, moveBoardPlayers, clearBoardPlayers } from "@/lib/board-players";
 import { nextAlternatingTierColor, type DraftSettingsInput } from "@/lib/validation";
 import type { BoardBucket, BoardBucketPlayer, BoardDetail } from "@/types";
@@ -66,6 +68,30 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerCardData | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const { scoring } = useFantasyScoring();
+  const boardPlayers = board?.buckets.flatMap((bucket) => bucket.players) ?? [];
+  const tracking = useSleeperLivePicks({
+    boardId,
+    players: boardPlayers,
+    initialDraftId: board?.sleeperDraftId ?? board?.draftSettings?.sleeperDraftId ?? null,
+    initialDraftPosition: board?.draftSettings?.draftPosition ?? null,
+    initialTeamCount: board?.draftSettings?.teamCount ?? null,
+    initialDraftType: board?.draftSettings?.draftType ?? null,
+    onPersistDraftId: (draftId) => {
+      void fetch(`/api/boards/${boardId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sleeperDraftId: draftId }),
+      }).then(async (response) => {
+        if (!response.ok) {
+          return;
+        }
+        const payload = (await response.json()) as { board?: BoardDetail };
+        if (payload.board) {
+          setBoard(payload.board);
+        }
+      });
+    },
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -454,6 +480,7 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
       ) : (
         <p className="text-sm text-zinc-500">No draft settings yet.</p>
       )}
+      <SleeperLiveTrackingBar {...tracking} />
       {selecting ? (
         <div className="flex flex-wrap items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800">
           <p className="text-zinc-500">{selectedIds.length} selected</p>
@@ -528,6 +555,8 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
                     player={player}
                     selecting={selecting}
                     selected={selectedIds.includes(player.playerId)}
+                    picked={tracking.pickedPlayerIds.has(player.playerId)}
+                    userDrafted={tracking.userDraftedPlayerIds.has(player.playerId)}
                     onSelect={() => setSelectedPlayer(toPlayerCard(player))}
                     onToggleSelect={() =>
                       setSelectedIds((current) =>

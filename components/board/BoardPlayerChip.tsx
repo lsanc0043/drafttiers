@@ -20,6 +20,8 @@ type BoardPlayerChipProps = {
   onToggleSelect?: () => void;
   onRemove?: () => void;
   onDropRelative?: (player: PlayerCardData, side: InsertSide) => void;
+  picked?: boolean;
+  userDrafted?: boolean;
 };
 
 export function BoardPlayerChip({
@@ -30,6 +32,8 @@ export function BoardPlayerChip({
   onToggleSelect,
   onRemove,
   onDropRelative,
+  picked = false,
+  userDrafted = false,
 }: BoardPlayerChipProps) {
   const didDrag = useRef(false);
   const [insertSide, setInsertSide] = useState<InsertSide | null>(null);
@@ -127,6 +131,13 @@ export function BoardPlayerChip({
         type="button"
         draggable={!selecting}
         aria-pressed={selecting ? selected : undefined}
+        aria-label={
+          userDrafted
+            ? `${player.fullName} (your pick)`
+            : picked
+              ? `${player.fullName} (picked)`
+              : player.fullName
+        }
         onClick={() => {
           if (didDrag.current) {
             didDrag.current = false;
@@ -139,10 +150,14 @@ export function BoardPlayerChip({
           onSelect();
         }}
         onDragStart={selecting ? undefined : onDragStart}
-        className={`flex w-24 flex-col items-center rounded-lg border bg-background px-2 py-2 text-center hover:border-zinc-400 dark:hover:border-zinc-500 ${
-          selected
-            ? "border-zinc-900 ring-2 ring-zinc-900 dark:border-zinc-100 dark:ring-zinc-100"
-            : "border-zinc-200 dark:border-zinc-700"
+        className={`flex w-24 flex-col items-center rounded-lg border px-2 py-2 text-center hover:border-zinc-400 dark:hover:border-zinc-500 ${
+          userDrafted
+            ? "border-emerald-600 bg-emerald-200 dark:border-emerald-500 dark:bg-emerald-900/80"
+            : picked
+            ? "border-zinc-200 bg-zinc-100 opacity-50 grayscale dark:border-zinc-800 dark:bg-zinc-900"
+            : selected
+              ? "border-zinc-900 bg-background ring-2 ring-zinc-900 dark:border-zinc-100 dark:ring-zinc-100"
+              : "border-zinc-200 bg-background dark:border-zinc-700"
         }`}
       >
         <PlayerPhoto
@@ -154,7 +169,7 @@ export function BoardPlayerChip({
         <span className="mt-2 min-w-0 w-full">
           <span className="block truncate text-xs font-semibold">{player.fullName}</span>
           <span className="block truncate text-[10px] text-zinc-500">
-            {player.teamAbbr ?? "FA"} · {player.position ?? "—"}
+            {userDrafted ? "Yours" : picked ? "Picked" : `${player.teamAbbr ?? "FA"} · ${player.position ?? "—"}`}
           </span>
         </span>
       </button>

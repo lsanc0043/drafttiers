@@ -29,6 +29,7 @@ export const draftSettingsSchema = z
     draftType: draftTypeSchema,
     roundTimerSeconds: z.number().int().min(1).max(3600),
     fantasyScoring: fantasyScoringSchema,
+    sleeperDraftId: z.string().trim().min(1).max(80).optional(),
   })
   .refine((value) => value.draftPosition <= value.teamCount, {
     message: "Draft position cannot be greater than the number of teams",
@@ -45,6 +46,7 @@ export const updateBoardSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   visibility: z.enum(["PRIVATE", "SHARED"]).optional(),
   draftSettings: draftSettingsSchema.nullable().optional(),
+  sleeperDraftId: z.string().trim().min(1).max(80).nullable().optional(),
 });
 
 export const bucketColorSchema = z
@@ -83,6 +85,10 @@ export const boardPlayerMoveSchema = z.object({
   boardPlayerId: z.string().min(1),
   bucketId: z.string().min(1),
   sortOrder: z.number().int().min(0),
+});
+
+export const sleeperDraftLookupSchema = z.object({
+  sleeperDraftId: z.string().trim().min(1).max(400),
 });
 
 export const sleeperDraftLinkSchema = z.object({
