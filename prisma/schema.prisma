@@ -64,6 +64,7 @@ model Bucket {
   name      String
   color     String        @default("#71717a")
   sortOrder Int
+  groups    Json          @default("[]")
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   players   BoardPlayer[]
@@ -192,6 +193,7 @@ model BoardPlayer {
   player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
   sortOrder Int
   notes     String?
+  favorited Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

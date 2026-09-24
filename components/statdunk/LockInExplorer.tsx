@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, type DragEvent } from "react";
+import { PlayerDragGrip } from "@/components/board/PlayerDragGrip";
 import {
   InjuryBadge,
   setDraggingPlayer,
@@ -8,8 +9,11 @@ import {
 } from "@/components/players/PlayerCard";
 import { PlayerModal } from "@/components/players/PlayerModal";
 import { PlayerPhoto } from "@/components/players/PlayerPhoto";
+import { STICKY_TH_CLASS } from "@/components/ui/StickyTable";
 import { FantasyScoringModal } from "@/components/players/FantasyScoringModal";
 import { useFantasyScoring } from "@/hooks/useFantasyScoring";
+import { useCoarsePointer } from "@/hooks/useCoarsePointer";
+import type { PlayerDropDest } from "@/lib/board-drop-target";
 import { teamTagStyle } from "@/lib/nba/team-colors";
 import type { InjuryLabel } from "@/lib/nba/injuries";
 import {
@@ -58,7 +62,9 @@ type LockInExplorerProps = {
   directoryPlayers?: Record<string, PlayerCardData>;
   variant?: "page" | "panel";
   draggable?: boolean;
-  excludedPlayerIds?: ReadonlySet<string>;
+  onPointerDrop?: (player: PlayerCardData, dest: PlayerDropDest) => void;
+  onBoardPlayerIds?: ReadonlySet<string>;
+  showOnBoardPlayers?: boolean;
 };
 
 type LockInRow = StatdunkNormalizedPlayer &
@@ -72,6 +78,23 @@ type LockInRow = StatdunkNormalizedPlayer &
 
 function fold(value: string) {
   return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+function isOnBoardPlayer(
+  player: LockInRow,
+  onBoardPlayerIds: ReadonlySet<string> | undefined,
+  photoIds: Record<string, number>,
+) {
+  if (!onBoardPlayerIds?.size) {
+    return false;
+  }
+  return Boolean(
+    (player.card && onBoardPlayerIds.has(player.card.id)) ||
+      (photoIds[player.rowKey] != null &&
+        onBoardPlayerIds.has(String(photoIds[player.rowKey]))) ||
+      (player.card?.nbaPersonId != null &&
+        onBoardPlayerIds.has(String(player.card.nbaPersonId))),
+  );
 }
 
 function formatNumber(value: number | null | undefined, digits = 1) {
@@ -204,9 +227,12 @@ export function LockInExplorer({
   directoryPlayers = {},
   variant = "page",
   draggable = false,
-  excludedPlayerIds,
+  onPointerDrop,
+  onBoardPlayerIds,
+  showOnBoardPlayers = false,
 }: LockInExplorerProps) {
   const isPanel = variant === "panel";
+  const coarse = useCoarsePointer();
   const { scoring, update } = useFantasyScoring();
   const didDrag = useRef(false);
   const [search, setSearch] = useState("");
@@ -267,13 +293,6 @@ export function LockInExplorer({
 
     return enriched
       .filter((player) => {
-        if (
-          excludedPlayerIds &&
-          player.card &&
-          excludedPlayerIds.has(player.card.id)
-        ) {
-          return false;
-        }
         if (team !== "all" && player.team !== team) {
           return false;
         }
@@ -284,6 +303,12 @@ export function LockInExplorer({
           if (!matches) {
             return false;
           }
+        }
+        if (
+          !showOnBoardPlayers &&
+          isOnBoardPlayer(player, onBoardPlayerIds, photoIds)
+        ) {
+          return false;
         }
         if (!query) {
           return true;
@@ -299,11 +324,12 @@ export function LockInExplorer({
   }, [
     dataset.players,
     directoryPlayers,
-    excludedPlayerIds,
     injuries,
+    onBoardPlayerIds,
     photoIds,
     search,
     selectedPositions,
+    showOnBoardPlayers,
     sort,
     sortDir,
     team,
@@ -365,7 +391,7 @@ export function LockInExplorer({
 
   return (
     <div
-      className={isPanel ? "flex h-full min-h-0 flex-col gap-3" : "space-y-4"}
+      className={isPanel ? "flex h-full min-h-0 flex-col gap-3 overflow-hidden" : "space-y-4"}
     >
       {isPanel ? null : (
         <p className="text-sm text-zinc-500">
@@ -451,17 +477,17 @@ export function LockInExplorer({
       <div
         className={
           isPanel
-            ? "min-h-0 flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800"
-            : "overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800"
+            ? "min-h-0 flex-1 overflow-auto overscroll-contain rounded-xl border border-zinc-200 dark:border-zinc-800"
+            : "max-h-[min(75dvh,52rem)] overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800"
         }
       >
-        <table className="w-full min-w-5xl border-collapse text-sm">
-          <thead className="sticky top-0 z-10 bg-background">
-            <tr className="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800">
+        <table className="w-full min-w-5xl border-separate border-spacing-0 text-sm">
+          <thead>
+            <tr className="text-xs uppercase tracking-wide text-zinc-500">
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`bg-background py-2 font-medium ${
+                  className={`${STICKY_TH_CLASS} py-2 font-medium ${
                     column.key === "expectedFptsPerActiveWeekRank"
                       ? "w-8 px-1 text-right"
                       : column.key === "playerName"
@@ -488,18 +514,26 @@ export function LockInExplorer({
           <tbody>
             {rows.map((player) => {
               const style = teamTagStyle(player.team);
+              const onBoard = isOnBoardPlayer(
+                player,
+                onBoardPlayerIds,
+                photoIds,
+              );
               return (
                 <tr
                   key={player.rowKey}
-                  className="border-b border-zinc-100 dark:border-zinc-900"
+                  className={`border-b border-zinc-100 dark:border-zinc-900 ${
+                    onBoard ? "opacity-40 grayscale" : ""
+                  }`}
                 >
                   <td className="w-8 px-1 py-2 text-right text-xs tabular-nums text-zinc-500">
                     {formatNumber(player.expectedFptsPerActiveWeekRank, 0)}
                   </td>
                   <td className="w-46 max-w-46 px-1.5 py-1.5">
+                    <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      draggable={draggable && Boolean(player.card)}
+                      draggable={draggable && !coarse && Boolean(player.card)}
                       onClick={() => {
                         if (didDrag.current) {
                           didDrag.current = false;
@@ -508,11 +542,11 @@ export function LockInExplorer({
                         openPlayer(player);
                       }}
                       onDragStart={
-                        draggable
+                        draggable && !coarse
                           ? (event) => onDragStart(event, player)
                           : undefined
                       }
-                      className="group flex w-full items-center gap-2 rounded-md px-1 py-0.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      className="group flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-0.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     >
                       <PlayerPhoto
                         nbaPersonId={photoIds[player.rowKey] ?? null}
@@ -556,6 +590,10 @@ export function LockInExplorer({
                         </div>
                       </div>
                     </button>
+                    {coarse && draggable && player.card ? (
+                      <PlayerDragGrip player={player.card} onDrop={onPointerDrop} />
+                    ) : null}
+                    </div>
                   </td>
                   {columns.slice(2).map((column) => (
                     <td

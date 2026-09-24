@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { BucketGroupBox } from "@/components/board/BucketGroupBox";
 import { BoardPlayerChip } from "@/components/board/BoardPlayerChip";
 import { DraftBoardCanvas } from "@/components/board/DraftBoardCanvas";
 import { DraftSettingsModal } from "@/components/board/DraftSettingsModal";
+import { FavoritesRosterPanel } from "@/components/board/FavoritesRosterPanel";
 import { SleeperLiveTrackingBar } from "@/components/board/SleeperLiveTrackingBar";
 import { TierModal } from "@/components/board/TierModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
@@ -11,13 +13,23 @@ import { BucketColumn } from "@/components/buckets/BucketColumn";
 import { type PlayerCardData } from "@/components/players/PlayerCard";
 import { PlayerDirectory } from "@/components/players/PlayerDirectory";
 import { PlayerModal } from "@/components/players/PlayerModal";
+import { PlayerBrowseSheet } from "@/components/board/PlayerBrowseSheet";
+import { HeldPlayerTray } from "@/components/board/HeldPlayerTray";
 import { LockInExplorer } from "@/components/statdunk/LockInExplorer";
 import { useFantasyScoring } from "@/hooks/useFantasyScoring";
 import { useSleeperLivePicks } from "@/hooks/useSleeperLivePicks";
-import { placeBoardPlayer, removeBoardPlayer, removeBoardPlayers, moveBoardPlayers, clearBoardPlayers, setBoardPlayerNotes } from "@/lib/board-players";
+import { placeBoardPlayer, removeBoardPlayer, removeBoardPlayers, moveBoardPlayers, clearBoardPlayers, clearBoardFavoritesLocal, setBoardPlayerNotes, setBoardPlayerFavorited } from "@/lib/board-players";
+import { moveBucketRelative } from "@/lib/board-buckets";
+import { addBoardGroup, deleteBucketGroup, groupedPlayerIdSet, nextGroupColor, uniqueBoardGroups, updateBucketGroup } from "@/lib/board-groups";
+import {
+  evaluateFavoriteLineup,
+  resolveBoardRosterRequirements,
+  toDraftedRosterPlayers,
+} from "@/lib/sleeper/roster";
 import type { LockInBundle } from "@/lib/statdunk/load";
 import { nextAlternatingTierColor, type DraftSettingsInput } from "@/lib/validation";
-import type { BoardBucket, BoardBucketPlayer, BoardDetail } from "@/types";
+import { type PlayerDropDest } from "@/lib/board-drop-target";
+import type { BoardBucket, BoardBucketGroup, BoardBucketPlayer, BoardDetail } from "@/types";
 
 type BoardEditorProps = {
   boardId: string;
@@ -40,6 +52,7 @@ function toBoardPlayer(player: PlayerCardData, existing?: BoardBucketPlayer): Bo
     isActive: player.isActive,
     sortOrder: 0,
     notes: null,
+    favorited: false,
   };
 }
 
@@ -67,12 +80,20 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [browseOpen, setBrowseOpen] = useState(false);
+  const [browseSnap, setBrowseSnap] = useState<"half" | "full">("half");
   const [browseCatalog, setBrowseCatalog] = useState<"lock-in" | "last-season">("lock-in");
+  const [showOnBoardPlayers, setShowOnBoardPlayers] = useState(false);
+  const [heldPlayer, setHeldPlayer] = useState<PlayerCardData | null>(null);
   const [browseWidthPct, setBrowseWidthPct] = useState(50);
   const splitRef = useRef<HTMLDivElement>(null);
   const [selecting, setSelecting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerCardData | null>(null);
+  const [groupModal, setGroupModal] = useState<
+    | { mode: "create"; playerIds: string[] }
+    | { mode: "edit"; group: BoardBucketGroup }
+    | null
+  >(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const { scoring } = useFantasyScoring();
   const boardPlayers = board?.buckets.flatMap((bucket) => bucket.players) ?? [];
@@ -136,6 +157,19 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
       titleInputRef.current?.select();
     }
   }, [editingTitle]);
+
+  useEffect(() => {
+    if (!heldPlayer) {
+      return;
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setHeldPlayer(null);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [heldPlayer]);
 
   function clampBrowseWidth(percent: number) {
     return Math.min(90, Math.max(50, percent));
@@ -213,7 +247,7 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
       throw new Error("Could not create tier");
     }
     const payload = (await response.json()) as { bucket: BoardBucket };
-    setBoard({ ...board, buckets: [...board.buckets, { ...payload.bucket, players: [] }] });
+    setBoard({ ...board, buckets: [...board.buckets, { ...payload.bucket, players: [], groups: payload.bucket.groups ?? uniqueBoardGroups(board.buckets).map((group) => ({ ...group, playerIds: [] })) }] });
     setTierModal(null);
     setError(null);
   }
@@ -266,10 +300,38 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
     setError(null);
   }
 
+  async function onReorderTiers(
+    draggedId: string,
+    targetId: string,
+    side: "before" | "after",
+  ) {
+    if (!board) {
+      return;
+    }
+    const nextBuckets = moveBucketRelative(board.buckets, draggedId, targetId, side);
+    if (nextBuckets.every((bucket, index) => bucket.id === board.buckets[index]?.id)) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: nextBuckets });
+    const response = await fetch(`/api/boards/${board.id}/buckets`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderedIds: nextBuckets.map((bucket) => bucket.id) }),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not reorder tiers");
+      return;
+    }
+    setError(null);
+  }
+
   async function onDropPlayer(
     bucketId: string,
     player: PlayerCardData,
     beforePlayerId?: string,
+    groupId?: string | null,
   ) {
     if (!board || player.id === beforePlayerId) {
       return;
@@ -282,7 +344,7 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
     const optimistic = toBoardPlayer(player, existing);
     setBoard({
       ...board,
-      buckets: placeBoardPlayer(board.buckets, optimistic, bucketId, beforePlayerId),
+      buckets: placeBoardPlayer(board.buckets, optimistic, bucketId, beforePlayerId, groupId),
     });
 
     const response = await fetch(`/api/boards/${board.id}/players`, {
@@ -291,6 +353,7 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
       body: JSON.stringify({
         playerId: player.id,
         bucketId,
+        groupId: groupId ?? null,
         ...(beforePlayerId ? { beforePlayerId } : {}),
       }),
     });
@@ -312,11 +375,32 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
               payload.player,
               payload.bucketId,
               beforePlayerId,
+              groupId,
             ),
           }
         : current,
     );
     setError(null);
+  }
+
+  function applyPlayerDrop(player: PlayerCardData, dest: PlayerDropDest) {
+    if (!board) {
+      return;
+    }
+    if (dest.relativePlayerId && dest.side === "before") {
+      void onDropPlayer(dest.bucketId, player, dest.relativePlayerId, dest.groupId);
+    } else if (dest.relativePlayerId && dest.side === "after") {
+      const bucket = board.buckets.find((entry) => entry.id === dest.bucketId);
+      const afterIndex =
+        bucket?.players.findIndex((entry) => entry.playerId === dest.relativePlayerId) ?? -1;
+      const next = bucket?.players
+        .slice(afterIndex + 1)
+        .find((entry) => entry.playerId !== player.id);
+      void onDropPlayer(dest.bucketId, player, next?.playerId, dest.groupId);
+    } else {
+      void onDropPlayer(dest.bucketId, player, undefined, dest.groupId);
+    }
+    setHeldPlayer(null);
   }
 
   async function onRemovePlayer(playerId: string) {
@@ -364,6 +448,144 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
             }
           : current,
       );
+    }
+    setError(null);
+  }
+
+  async function onToggleFavorite(playerId: string, favorited: boolean) {
+    if (!board) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: setBoardPlayerFavorited(board.buckets, playerId, favorited) });
+    const response = await fetch(`/api/boards/${board.id}/players/${playerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ favorited }),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not update favorite");
+      return;
+    }
+    const payload = (await response.json()) as { player?: BoardBucketPlayer };
+    if (payload.player) {
+      setBoard((current) =>
+        current
+          ? {
+              ...current,
+              buckets: setBoardPlayerFavorited(
+                current.buckets,
+                playerId,
+                payload.player?.favorited ?? favorited,
+              ),
+            }
+          : current,
+      );
+    }
+    setError(null);
+  }
+
+  async function onClearFavorites() {
+    if (!board) {
+      return;
+    }
+    const hasFavorite = board.buckets.some((bucket) =>
+      bucket.players.some((player) => player.favorited),
+    );
+    if (!hasFavorite) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: clearBoardFavoritesLocal(board.buckets) });
+    const response = await fetch(`/api/boards/${board.id}/favorites`, { method: "DELETE" });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not clear favorites");
+      return;
+    }
+    setError(null);
+  }
+
+  async function onCreateGroup(input: { name: string; color: string }) {
+    if (!board || groupModal?.mode !== "create") {
+      return;
+    }
+    const previous = board;
+    const group: BoardBucketGroup = {
+      id: `pending-${crypto.randomUUID()}`,
+      name: input.name,
+      color: input.color,
+      playerIds: groupModal.playerIds,
+    };
+    setBoard({
+      ...board,
+      buckets: addBoardGroup(board.buckets, group),
+    });
+    const response = await fetch(`/api/boards/${board.id}/groups`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: input.name,
+        color: input.color,
+        playerIds: groupModal.playerIds,
+      }),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      throw new Error("Could not create subcategory");
+    }
+    const payload = (await response.json()) as { group: BoardBucketGroup };
+    setBoard((current) =>
+      current
+        ? {
+            ...current,
+            buckets: addBoardGroup(deleteBucketGroup(current.buckets, group.id), payload.group),
+          }
+        : current,
+    );
+    setGroupModal(null);
+    setSelectedIds([]);
+    setSelecting(false);
+    setError(null);
+  }
+
+  async function onUpdateGroup(input: { name: string; color: string }) {
+    if (!board || groupModal?.mode !== "edit") {
+      return;
+    }
+    const previous = board;
+    const groupId = groupModal.group.id;
+    setBoard({
+      ...board,
+      buckets: updateBucketGroup(board.buckets, groupId, input),
+    });
+    const response = await fetch(`/api/boards/${board.id}/groups/${groupId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      throw new Error("Could not update subcategory");
+    }
+    setGroupModal(null);
+    setError(null);
+  }
+
+  async function onDeleteGroup(groupId: string) {
+    if (!board) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: deleteBucketGroup(board.buckets, groupId) });
+    const response = await fetch(`/api/boards/${board.id}/groups/${groupId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not delete subcategory");
+      return;
     }
     setError(null);
   }
@@ -431,9 +653,38 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
     return <p className="text-sm text-red-600">{error ?? "Board not found"}</p>;
   }
 
+  const assignedPlayerIds = new Set(
+    board.buckets.flatMap((bucket) => bucket.players.map((player) => player.playerId)),
+  );
+  const lockInOnBoardIds = new Set([
+    ...assignedPlayerIds,
+    ...board.buckets.flatMap((bucket) =>
+      bucket.players.map((player) => String(player.nbaPersonId)),
+    ),
+  ]);
+  const excludedPlayerIds = showOnBoardPlayers ? undefined : assignedPlayerIds;
+  const favoritePlayers = board.buckets.flatMap((bucket) =>
+    bucket.players.filter((player) => player.favorited),
+  );
+  const favoriteRoster = resolveBoardRosterRequirements(
+    tracking.roster.requirements,
+    board.draftSettings,
+  );
+  const favoriteEvaluation = evaluateFavoriteLineup(
+    favoriteRoster.requirements,
+    toDraftedRosterPlayers(
+      favoritePlayers.map((player) => ({
+        playerId: player.playerId,
+        label: player.fullName,
+        positions: player.position,
+      })),
+    ),
+    favoriteRoster.usingDefaultSlots,
+  );
+
   const boardPane = (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div data-board-chrome className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           {editingTitle ? (
             <input
@@ -487,7 +738,14 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setBrowseOpen((open) => !open)}
+            onClick={() => {
+              setBrowseOpen((open) => {
+                if (!open) {
+                  setBrowseSnap("half");
+                }
+                return !open;
+              });
+            }}
             className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium dark:border-zinc-700"
             aria-pressed={browseOpen}
           >
@@ -530,6 +788,12 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
         </div>
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      <FavoritesRosterPanel
+        favorites={favoritePlayers}
+        evaluation={favoriteEvaluation}
+        onSelect={(player) => setSelectedPlayer(toPlayerCard(player))}
+        onClear={() => void onClearFavorites()}
+      />
       {board.draftSettings ? (
         <p className="text-sm text-zinc-500">
           {board.draftSettings.teamCount}-team {board.draftSettings.draftType.toLowerCase()} · pick{" "}
@@ -539,7 +803,6 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
       ) : (
         <p className="text-sm text-zinc-500">No draft settings yet.</p>
       )}
-      <SleeperLiveTrackingBar {...tracking} />
       {selecting ? (
         <div className="flex flex-wrap items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800">
           <p className="text-zinc-500">{selectedIds.length} selected</p>
@@ -585,6 +848,16 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
           >
             Unassign
           </button>
+          <button
+            type="button"
+            disabled={selectedIds.length === 0}
+            onClick={() => {
+              setGroupModal({ mode: "create", playerIds: selectedIds });
+            }}
+            className="rounded-md border border-zinc-300 px-3 py-1 disabled:opacity-50 dark:border-zinc-700"
+          >
+            Create subcategory
+          </button>
         </div>
       ) : null}
 
@@ -593,7 +866,57 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
           {board.buckets.length === 0 ? (
             <p className="text-sm text-zinc-500">No tiers yet. Create a tier to get started.</p>
           ) : (
-            board.buckets.map((bucket, index) => (
+            board.buckets.map((bucket, index) => {
+              const groupedIds = groupedPlayerIdSet(bucket.groups);
+              const ungrouped = bucket.players.filter((player) => !groupedIds.has(player.playerId));
+              function renderChip(player: BoardBucketPlayer, groupId: string | null) {
+                return (
+                  <BoardPlayerChip
+                    key={player.playerId}
+                    player={player}
+                    bucketId={bucket.id}
+                    groupId={groupId}
+                    selecting={selecting}
+                    selected={selectedIds.includes(player.playerId)}
+                    placingPlayer={heldPlayer}
+                    picked={tracking.pickedPlayerIds.has(player.playerId)}
+                    userDrafted={tracking.userDraftedPlayerIds.has(player.playerId)}
+                    onSelect={() => setSelectedPlayer(toPlayerCard(player))}
+                    onToggleSelect={() =>
+                      setSelectedIds((current) =>
+                        current.includes(player.playerId)
+                          ? current.filter((id) => id !== player.playerId)
+                          : [...current, player.playerId],
+                      )
+                    }
+                    onRemove={() =>
+                      groupId
+                        ? void onDropPlayer(bucket.id, toPlayerCard(player), undefined, null)
+                        : void onRemovePlayer(player.playerId)
+                    }
+                    onSaveNotes={(notes) => onSaveNotes(player.playerId, notes)}
+                    onToggleFavorite={() =>
+                      void onToggleFavorite(player.playerId, !player.favorited)
+                    }
+                    onPointerDrop={applyPlayerDrop}
+                    onPlaced={() => setHeldPlayer(null)}
+                    onDropRelative={(dropped, side) => {
+                      if (side === "before") {
+                        void onDropPlayer(bucket.id, dropped, player.playerId, groupId);
+                        return;
+                      }
+                      const afterIndex = bucket.players.findIndex(
+                        (entry) => entry.playerId === player.playerId,
+                      );
+                      const next = bucket.players
+                        .slice(afterIndex + 1)
+                        .find((entry) => entry.playerId !== dropped.id);
+                      void onDropPlayer(bucket.id, dropped, next?.playerId, groupId);
+                    }}
+                  />
+                );
+              }
+              return (
               <BucketColumn
                 key={bucket.id}
                 id={bucket.id}
@@ -605,44 +928,40 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
                 }}
                 onDelete={() => void onDeleteTier(bucket.id)}
                 onDropPlayer={(player, beforePlayerId) =>
-                  void onDropPlayer(bucket.id, player, beforePlayerId)
+                  void onDropPlayer(bucket.id, player, beforePlayerId, null)
+                }
+                placingPlayer={heldPlayer}
+                onPlaced={() => setHeldPlayer(null)}
+                onReorder={(draggedId, targetId, side) =>
+                  void onReorderTiers(draggedId, targetId, side)
+                }
+                onCreateSubcategory={() =>
+                  setGroupModal({ mode: "create", playerIds: selectedIds })
                 }
               >
-                {bucket.players.map((player) => (
-                  <BoardPlayerChip
-                    key={player.playerId}
-                    player={player}
-                    selecting={selecting}
-                    selected={selectedIds.includes(player.playerId)}
-                    picked={tracking.pickedPlayerIds.has(player.playerId)}
-                    userDrafted={tracking.userDraftedPlayerIds.has(player.playerId)}
-                    onSelect={() => setSelectedPlayer(toPlayerCard(player))}
-                    onToggleSelect={() =>
-                      setSelectedIds((current) =>
-                        current.includes(player.playerId)
-                          ? current.filter((id) => id !== player.playerId)
-                          : [...current, player.playerId],
+                {bucket.groups.map((group) => (
+                  <BucketGroupBox
+                    key={group.id}
+                    group={group}
+                    bucketId={bucket.id}
+                    placingPlayer={heldPlayer}
+                    onPlaced={() => setHeldPlayer(null)}
+                    onEdit={() => setGroupModal({ mode: "edit", group })}
+                    onDelete={() => void onDeleteGroup(group.id)}
+                    onDropPlayer={(player) => void onDropPlayer(bucket.id, player, undefined, group.id)}
+                  >
+                    {group.playerIds
+                      .map((playerId) =>
+                        bucket.players.find((player) => player.playerId === playerId),
                       )
-                    }
-                    onRemove={() => void onRemovePlayer(player.playerId)}
-                    onSaveNotes={(notes) => onSaveNotes(player.playerId, notes)}
-                    onDropRelative={(dropped, side) => {
-                      if (side === "before") {
-                        void onDropPlayer(bucket.id, dropped, player.playerId);
-                        return;
-                      }
-                      const afterIndex = bucket.players.findIndex(
-                        (entry) => entry.playerId === player.playerId,
-                      );
-                      const next = bucket.players
-                        .slice(afterIndex + 1)
-                        .find((entry) => entry.playerId !== dropped.id);
-                      void onDropPlayer(bucket.id, dropped, next?.playerId);
-                    }}
-                  />
+                      .filter((player): player is BoardBucketPlayer => Boolean(player))
+                      .map((player) => renderChip(player, group.id))}
+                  </BucketGroupBox>
                 ))}
+                {ungrouped.map((player) => renderChip(player, null))}
               </BucketColumn>
-            ))
+              );
+            })
           )}
         </div>
       </DraftBoardCanvas>
@@ -655,12 +974,12 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
         ref={splitRef}
         className={
           browseOpen
-            ? "flex h-[calc(100dvh-5.5rem)] min-h-0"
+            ? "md:flex md:h-[calc(100dvh-5.5rem)] md:min-h-0 md:flex-row"
             : undefined
         }
       >
         <div
-          className={browseOpen ? "min-h-0 min-w-0 flex-1 overflow-y-auto pr-1" : undefined}
+          className={browseOpen ? "md:min-h-0 md:min-w-0 md:flex-1 md:overflow-y-auto md:pr-1" : undefined}
         >
           {boardPane}
         </div>
@@ -695,11 +1014,13 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
                   setBrowseWidthPct(90);
                 }
               }}
-              className="w-1.5 shrink-0 cursor-col-resize self-stretch border-0 bg-zinc-200 hover:bg-zinc-400 dark:bg-zinc-800 dark:hover:bg-zinc-500"
+              className="hidden w-1.5 shrink-0 cursor-col-resize self-stretch border-0 bg-zinc-200 hover:bg-zinc-400 md:block dark:bg-zinc-800 dark:hover:bg-zinc-500"
             />
-            <aside
-              className="flex min-h-0 shrink-0 flex-col overflow-hidden pl-3"
-              style={{ width: `${browseWidthPct}%`, minWidth: "50%" }}
+            <PlayerBrowseSheet
+              desktopWidthPct={browseWidthPct}
+              snap={browseSnap}
+              onSnap={setBrowseSnap}
+              onHide={() => setBrowseOpen(false)}
             >
             <div className="mb-3 flex shrink-0 gap-1 rounded-lg border border-zinc-300 p-0.5 dark:border-zinc-700">
               <button
@@ -727,6 +1048,15 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
                 Last season
               </button>
             </div>
+            <label className="mb-3 flex shrink-0 items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
+              <input
+                type="checkbox"
+                checked={showOnBoardPlayers}
+                onChange={(event) => setShowOnBoardPlayers(event.target.checked)}
+              />
+              Show players already in tiers
+            </label>
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
             {browseCatalog === "lock-in" ? (
               lockIn ? (
                 <LockInExplorer
@@ -736,13 +1066,9 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
                   photoIds={lockIn.photoIds}
                   directoryPlayers={lockIn.directoryPlayers}
                   injuries={lockIn.injuries}
-                  excludedPlayerIds={
-                    new Set(
-                      board.buckets.flatMap((bucket) =>
-                        bucket.players.map((player) => player.playerId),
-                      ),
-                    )
-                  }
+                  onBoardPlayerIds={lockInOnBoardIds}
+                  showOnBoardPlayers={showOnBoardPlayers}
+                  onPointerDrop={applyPlayerDrop}
                 />
               ) : (
                 <p className="text-sm text-zinc-500">
@@ -753,16 +1079,12 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
               <PlayerDirectory
                 variant="panel"
                 draggable
-                excludedPlayerIds={
-                  new Set(
-                    board.buckets.flatMap((bucket) =>
-                      bucket.players.map((player) => player.playerId),
-                    ),
-                  )
-                }
+                excludedPlayerIds={excludedPlayerIds}
+                onPointerDrop={applyPlayerDrop}
               />
             )}
-            </aside>
+            </div>
+            </PlayerBrowseSheet>
           </>
         ) : null}
       </div>
@@ -787,6 +1109,26 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
           )}
           onClose={() => setTierModal(null)}
           onSave={(input) => onUpdateTier(tierModal, input)}
+        />
+      ) : null}
+      {groupModal?.mode === "create" ? (
+        <TierModal
+          title="Create subcategory"
+          submitLabel="Create subcategory"
+          initialColor={nextGroupColor(uniqueBoardGroups(board.buckets).length)}
+          onClose={() => setGroupModal(null)}
+          onSave={onCreateGroup}
+        />
+      ) : null}
+      {groupModal?.mode === "edit" ? (
+        <TierModal
+          key={groupModal.group.id}
+          title="Edit subcategory"
+          submitLabel="Save subcategory"
+          initialName={groupModal.group.name}
+          initialColor={groupModal.group.color}
+          onClose={() => setGroupModal(null)}
+          onSave={onUpdateGroup}
         />
       ) : null}
       {resetOpen ? (
@@ -815,6 +1157,10 @@ export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
           onClose={() => setSelectedPlayer(null)}
         />
       ) : null}
+      {heldPlayer ? (
+        <HeldPlayerTray player={heldPlayer} onCancel={() => setHeldPlayer(null)} />
+      ) : null}
+      <SleeperLiveTrackingBar {...tracking} />
     </>
   );
 }

@@ -17,7 +17,7 @@ export async function PATCH(request: Request, { params }: BoardPlayerRouteContex
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const player = await updateBoardPlayerNotes(id, playerId, parsed.data.notes);
+  const player = await updateBoardPlayerNotes(id, playerId, parsed.data);
   if (!player) {
     return NextResponse.json({ error: "Player is not on this board" }, { status: 404 });
   }

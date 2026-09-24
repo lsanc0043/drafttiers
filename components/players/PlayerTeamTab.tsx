@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { InjuryBadge, type PlayerCardData } from "@/components/players/PlayerCard";
 import { PlayerPhoto } from "@/components/players/PlayerPhoto";
+import { STICKY_TH_CLASS } from "@/components/ui/StickyTable";
 import {
   DEPTH_LABELS,
   STARTING_FIVE_SLOTS,
@@ -161,17 +162,17 @@ export function PlayerTeamTab({ player, onSelect }: PlayerTeamTabProps) {
   );
 
   return (
-    <div className="mt-2 md:min-h-0 md:flex-1 md:overflow-auto">
-      <p className="mb-2 text-xs text-zinc-500">
+    <div className="mt-2 flex min-h-0 flex-col md:flex-1">
+      <p className="mb-2 shrink-0 text-xs text-zinc-500">
         {seasonLabel ?? "2026-27"} Lock-In depth by projected minutes
       </p>
-      <div className="overflow-x-auto">
+      <div className="min-h-0 max-h-[min(50dvh,24rem)] overflow-auto md:max-h-none md:flex-1">
         <table className="w-full min-w-xl border-separate border-spacing-0 text-left text-sm">
           <thead>
             <tr className="text-xs uppercase tracking-wide text-zinc-500">
-              <th className="w-14 py-2 pr-2 font-medium">Pos</th>
+              <th className={`${STICKY_TH_CLASS} w-14 py-2 pr-2 text-left font-medium`}>Pos</th>
               {DEPTH_LABELS.map((label) => (
-                <th key={label} className="py-2 pr-2 font-medium">
+                <th key={label} className={`${STICKY_TH_CLASS} py-2 pr-2 text-left font-medium`}>
                   {label}
                 </th>
               ))}

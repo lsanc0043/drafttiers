@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { diffDraftPicks } from "@/lib/sleeper/tracker/diff";
 import {
   calculateRosterNeeds,
+  defaultNbaRosterRequirements,
+  evaluateFavoriteLineup,
   getPlayerEligibleSlots,
   getUserPicks,
   parseNbaPositions,
@@ -249,5 +251,62 @@ describe("draft changes and corrections", () => {
 
     const changed = diffDraftPicks([pick(1, "a", "me")], [pick(1, "c", "me")]);
     expect(changed.changed[0]?.current.playerId).toBe("c");
+  });
+});
+
+describe("evaluateFavoriteLineup", () => {
+  it("treats a full Sleeper NBA set as a legal team", () => {
+    const players = [
+      player("1", "PG", "PG"),
+      player("2", "SG", "SG"),
+      player("3", "G", "SG"),
+      player("4", "SF", "SF"),
+      player("5", "PF", "PF"),
+      player("6", "F", "SF"),
+      player("7", "C", "C"),
+      player("8", "U1", "PG"),
+      player("9", "U2", "C"),
+    ];
+    const result = evaluateFavoriteLineup(STANDARD, players);
+    expect(result.status).toBe("legal");
+    expect(result.missingPositions).toEqual([]);
+    expect(result.startersFilled).toBe(9);
+  });
+
+  it("uses 1 PG/SG/G/SF/PF/F/C, 2 UTIL, and 4 BN", () => {
+    const requirements = defaultNbaRosterRequirements();
+    expect(requirements).toMatchObject({
+      PG: 1,
+      SG: 1,
+      G: 1,
+      SF: 1,
+      PF: 1,
+      F: 1,
+      C: 1,
+      UTIL: 2,
+      bench: 4,
+    });
+    const result = evaluateFavoriteLineup(requirements, [player("1", "Jokic", "C")]);
+    expect(result.assignment.filter((slot) => slot.position === "BN")).toHaveLength(4);
+    expect(result.rosterSpots).toBe(13);
+    expect(result.starterSpots).toBe(9);
+  });
+
+  it("is incomplete when starters are still open and nobody is leftover", () => {
+    const result = evaluateFavoriteLineup(STANDARD, [player("1", "Jokic", "C")]);
+    expect(result.status).toBe("incomplete");
+    expect(result.missingPositions).toContain("PG");
+  });
+
+  it("is illegal when leftover favorites cannot fill remaining starter slots", () => {
+    const result = evaluateFavoriteLineup(STANDARD, [
+      player("1", "A", "C"),
+      player("2", "B", "C"),
+      player("3", "C", "C"),
+      player("4", "D", "C"),
+    ]);
+    expect(result.status).toBe("illegal");
+    expect(result.missingPositions.length).toBeGreaterThan(0);
+    expect(result.overflow.length + result.bench.length).toBeGreaterThan(0);
   });
 });

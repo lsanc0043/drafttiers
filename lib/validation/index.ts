@@ -70,6 +70,10 @@ export const createBucketSchema = z.object({
 
 export const updateBucketSchema = createBucketSchema.partial();
 
+export const reorderBucketsSchema = z.object({
+  orderedIds: z.array(z.string().min(1)).min(1).max(100),
+});
+
 export const playerSearchSchema = z.object({
   query: z.string().trim().max(80).optional().default(""),
   limit: z.coerce.number().int().min(1).max(50).default(20),
@@ -79,6 +83,7 @@ export const assignBoardPlayerSchema = z.object({
   playerId: z.string().min(1),
   bucketId: z.string().min(1),
   beforePlayerId: z.string().min(1).optional(),
+  groupId: z.string().min(1).nullable().optional(),
 });
 
 export const boardPlayerMoveSchema = z.object({
@@ -96,16 +101,23 @@ export const sleeperDraftLinkSchema = z.object({
   sleeperDraftId: z.string().min(1),
 });
 
-export const updateBoardPlayerNotesSchema = z.object({
-  notes: z
-    .string()
-    .max(2000)
-    .nullable()
-    .transform((value) => {
-      const trimmed = value?.trim() ?? "";
-      return trimmed.length > 0 ? trimmed : null;
-    }),
-});
+export const updateBoardPlayerNotesSchema = z
+  .object({
+    notes: z.string().max(2000).nullable().optional(),
+    favorited: z.boolean().optional(),
+  })
+  .refine((value) => value.notes !== undefined || value.favorited !== undefined, {
+    message: "notes or favorited is required",
+  })
+  .transform((value) => ({
+    notes:
+      value.notes === undefined
+        ? undefined
+        : value.notes?.trim()
+          ? value.notes.trim()
+          : null,
+    favorited: value.favorited,
+  }));
 
 export const bulkBoardPlayersSchema = z
   .object({
@@ -118,13 +130,28 @@ export const bulkBoardPlayersSchema = z
     path: ["bucketId"],
   });
 
+export const createBucketGroupSchema = z.object({
+  bucketId: z.string().min(1).optional(),
+  name: z.string().trim().min(1).max(80),
+  color: bucketColorSchema,
+  playerIds: z.array(z.string().min(1)).max(200).default([]),
+});
+
+export const updateBucketGroupSchema = z.object({
+  name: z.string().trim().min(1).max(80).optional(),
+  color: bucketColorSchema.optional(),
+});
+
 export type DraftSettingsInput = z.infer<typeof draftSettingsSchema>;
 export type CreateBoardInput = z.infer<typeof createBoardSchema>;
 export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;
 export type CreateBucketInput = z.infer<typeof createBucketSchema>;
 export type UpdateBucketInput = z.infer<typeof updateBucketSchema>;
+export type ReorderBucketsInput = z.infer<typeof reorderBucketsSchema>;
 export type PlayerSearchInput = z.infer<typeof playerSearchSchema>;
 export type AssignBoardPlayerInput = z.infer<typeof assignBoardPlayerSchema>;
 export type UpdateBoardPlayerNotesInput = z.infer<typeof updateBoardPlayerNotesSchema>;
 export type BulkBoardPlayersInput = z.infer<typeof bulkBoardPlayersSchema>;
 export type BoardPlayerMoveInput = z.infer<typeof boardPlayerMoveSchema>;
+export type CreateBucketGroupInput = z.infer<typeof createBucketGroupSchema>;
+export type UpdateBucketGroupInput = z.infer<typeof updateBucketGroupSchema>;

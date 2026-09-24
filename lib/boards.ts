@@ -1,16 +1,29 @@
 import { type PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { parseFantasyScoring } from "@/lib/nba/fantasy";
+import { applyInjuryFlags, getInjuryIndex } from "@/lib/nba/injuries";
 import type {
   AssignBoardPlayerInput,
   BulkBoardPlayersInput,
   CreateBoardInput,
   CreateBucketInput,
+  CreateBucketGroupInput,
   DraftSettingsInput,
   UpdateBoardInput,
   UpdateBucketInput,
+  UpdateBucketGroupInput,
+  ReorderBucketsInput,
 } from "@/lib/validation";
 import type { BoardBucket, BoardBucketPlayer, BoardDetail, BoardSummary, DraftSettings } from "@/types";
+import {
+  addBoardGroup,
+  deleteBucketGroup,
+  parseBucketGroups,
+  setPlayerGroup,
+  syncGroupShells,
+  uniqueBoardGroups,
+  updateBucketGroup,
+} from "@/lib/board-groups";
 
 type BoardRecord = {
   id: string;
@@ -30,6 +43,7 @@ type BoardRecord = {
     name: string;
     color?: string | null;
     sortOrder: number;
+    groups?: unknown;
   }>;
 };
 
@@ -39,6 +53,7 @@ type AssignmentRecord = {
   playerId: string;
   sortOrder: number;
   notes?: string | null;
+  favorited?: boolean;
   player: {
     id: string;
     nbaPersonId: number;
@@ -48,6 +63,9 @@ type AssignmentRecord = {
     position: string | null;
     jerseyNumber: string | null;
     isActive: boolean;
+    isInjured?: boolean;
+    injuryLabel?: "GTD" | "DTD" | "OUT" | null;
+    injuryUrl?: string | null;
   };
 };
 
@@ -64,6 +82,10 @@ function serializeAssignment(assignment: AssignmentRecord): BoardBucketPlayer {
     isActive: assignment.player.isActive,
     sortOrder: assignment.sortOrder,
     notes: assignment.notes ?? null,
+    favorited: assignment.favorited ?? false,
+    isInjured: assignment.player.isInjured ?? false,
+    injuryLabel: assignment.player.injuryLabel ?? null,
+    injuryUrl: assignment.player.injuryUrl ?? null,
   };
 }
 
@@ -76,6 +98,7 @@ function serializeBucket(
     name: bucket.name,
     color: bucket.color ?? "#71717a",
     sortOrder: bucket.sortOrder,
+    groups: parseBucketGroups(bucket.groups),
     players,
   };
 }
@@ -215,15 +238,17 @@ function serializeBoard(
     updatedAt: board.updatedAt.toISOString(),
     sleeperDraftId: board.sleeperDraftId ?? null,
     draftSettings: serializeDraftSettings(board),
-    buckets: [...board.buckets]
-      .sort((left, right) => left.sortOrder - right.sortOrder)
-      .map((bucket) => serializeBucket(bucket, playersByBucket.get(bucket.id) ?? [])),
+    buckets: syncGroupShells(
+      [...board.buckets]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map((bucket) => serializeBucket(bucket, playersByBucket.get(bucket.id) ?? [])),
+    ),
   };
 }
 
 async function loadBuckets(boardId: string, db: PrismaClient) {
   return db.$queryRaw<BoardRecord["buckets"]>`
-    SELECT id, name, color, "sortOrder"
+    SELECT id, name, color, "sortOrder", groups
     FROM "Bucket"
     WHERE "boardId" = ${boardId}
     ORDER BY "sortOrder" ASC
@@ -231,24 +256,36 @@ async function loadBuckets(boardId: string, db: PrismaClient) {
 }
 
 async function loadAssignments(boardId: string, db: PrismaClient) {
-  return db.boardPlayer.findMany({
-    where: { boardId },
-    orderBy: { sortOrder: "asc" },
-    include: {
-      player: {
-        select: {
-          id: true,
-          nbaPersonId: true,
-          fullName: true,
-          teamAbbr: true,
-          teamName: true,
-          position: true,
-          jerseyNumber: true,
-          isActive: true,
+  const [assignments, flags] = await Promise.all([
+    db.boardPlayer.findMany({
+      where: { boardId },
+      orderBy: { sortOrder: "asc" },
+      include: {
+        player: {
+          select: {
+            id: true,
+            nbaPersonId: true,
+            fullName: true,
+            teamAbbr: true,
+            teamName: true,
+            position: true,
+            jerseyNumber: true,
+            isActive: true,
+          },
         },
       },
-    },
-  });
+    }),
+    db.$queryRaw<Array<{ id: string; favorited: boolean }>>`
+      SELECT id, "favorited"
+      FROM "BoardPlayer"
+      WHERE "boardId" = ${boardId}
+    `.catch(() => [] as Array<{ id: string; favorited: boolean }>),
+  ]);
+  const favoritedById = new Map(flags.map((row) => [row.id, Boolean(row.favorited)]));
+  return assignments.map((assignment) => ({
+    ...assignment,
+    favorited: favoritedById.get(assignment.id) ?? false,
+  }));
 }
 
 export async function listBoards(db: PrismaClient = prisma): Promise<BoardSummary[]> {
@@ -363,11 +400,45 @@ export async function addBucket(
   const nextOrder = input.sortOrder ?? Number(orderRows[0]?.maxOrder ?? -1) + 1;
   const now = new Date();
   const id = crypto.randomUUID();
-
-  await db.$executeRaw`
-    INSERT INTO "Bucket" ("id", "boardId", "name", "color", "sortOrder", "createdAt", "updatedAt")
-    VALUES (${id}, ${boardId}, ${input.name}, ${input.color}, ${nextOrder}, ${now}, ${now})
+  const groupRows = await db.$queryRaw<Array<{ groups: unknown }>>`
+    SELECT groups FROM "Bucket" WHERE "boardId" = ${boardId}
   `;
+  const groupShells = uniqueBoardGroups(
+    groupRows.map((row, index) => ({
+      id: String(index),
+      name: "",
+      color: "#000000",
+      sortOrder: index,
+      groups: parseBucketGroups(row.groups),
+      players: [],
+    })),
+  ).map((group) => ({
+    id: group.id,
+    name: group.name,
+    color: group.color,
+    playerIds: [] as string[],
+  }));
+  const groupsJson = JSON.stringify(groupShells);
+
+  if (typeof db.$executeRawUnsafe === "function") {
+    await db.$executeRawUnsafe(
+      `INSERT INTO "Bucket" ("id", "boardId", "name", "color", "sortOrder", "groups", "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8)`,
+      id,
+      boardId,
+      input.name,
+      input.color,
+      nextOrder,
+      groupsJson,
+      now,
+      now,
+    );
+  } else {
+    await db.$executeRaw`
+      INSERT INTO "Bucket" ("id", "boardId", "name", "color", "sortOrder", "groups", "createdAt", "updatedAt")
+      VALUES (${id}, ${boardId}, ${input.name}, ${input.color}, ${nextOrder}, '[]'::jsonb, ${now}, ${now})
+    `;
+  }
   await db.board.update({ where: { id: boardId }, data: { updatedAt: now } });
 
   return serializeBucket({
@@ -375,6 +446,7 @@ export async function addBucket(
     name: input.name,
     color: input.color,
     sortOrder: nextOrder,
+    groups: groupShells,
   });
 }
 
@@ -385,7 +457,7 @@ export async function updateBucket(
   db: PrismaClient = prisma,
 ) {
   const [existing] = await db.$queryRaw<BoardRecord["buckets"]>`
-    SELECT id, name, color, "sortOrder"
+    SELECT id, name, color, "sortOrder", groups
     FROM "Bucket"
     WHERE id = ${bucketId} AND "boardId" = ${boardId}
     LIMIT 1
@@ -422,6 +494,40 @@ export async function deleteBucket(
   }
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
   return true;
+}
+
+export async function reorderBuckets(
+  boardId: string,
+  input: ReorderBucketsInput,
+  db: PrismaClient = prisma,
+) {
+  const board = await db.board.findUnique({ where: { id: boardId }, select: { id: true } });
+  if (!board) {
+    return { ok: false as const, reason: "board" };
+  }
+  const rows = await db.$queryRaw<Array<{ id: string }>>`
+    SELECT id FROM "Bucket" WHERE "boardId" = ${boardId}
+  `;
+  const existing = new Set(rows.map((row) => row.id));
+  if (
+    input.orderedIds.length !== existing.size ||
+    input.orderedIds.some((id) => !existing.has(id)) ||
+    new Set(input.orderedIds).size !== input.orderedIds.length
+  ) {
+    return { ok: false as const, reason: "order" };
+  }
+  const now = new Date();
+  await Promise.all(
+    input.orderedIds.map((id, sortOrder) =>
+      db.$executeRaw`
+        UPDATE "Bucket"
+        SET "sortOrder" = ${sortOrder}, "updatedAt" = ${now}
+        WHERE id = ${id} AND "boardId" = ${boardId}
+      `,
+    ),
+  );
+  await db.board.update({ where: { id: boardId }, data: { updatedAt: now } });
+  return { ok: true as const };
 }
 
 export async function assignPlayerToBucket(
@@ -506,6 +612,17 @@ export async function assignPlayerToBucket(
   );
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
 
+  if (typeof db.$queryRaw === "function" && typeof db.$executeRawUnsafe === "function") {
+    const current = await getBoard(boardId, db);
+    if (current) {
+      await persistBucketGroups(
+        boardId,
+        setPlayerGroup(current.buckets, input.playerId, input.bucketId, input.groupId ?? null),
+        db,
+      );
+    }
+  }
+
   return {
     ok: true as const,
     player: serializeAssignment({
@@ -514,10 +631,31 @@ export async function assignPlayerToBucket(
       playerId: assignment.playerId,
       sortOrder,
       notes: assignment.notes,
+      favorited: assignment.favorited,
       player,
     }),
     bucketId: input.bucketId,
   };
+}
+
+async function persistBucketGroups(
+  boardId: string,
+  buckets: BoardBucket[],
+  db: PrismaClient,
+) {
+  const now = new Date();
+  await Promise.all(
+    buckets.map((bucket) =>
+      db.$executeRawUnsafe(
+        `UPDATE "Bucket" SET "groups" = $1::jsonb, "updatedAt" = $2 WHERE id = $3 AND "boardId" = $4`,
+        JSON.stringify(bucket.groups),
+        now,
+        bucket.id,
+        boardId,
+      ),
+    ),
+  );
+  await db.board.update({ where: { id: boardId }, data: { updatedAt: now } });
 }
 
 export async function unassignPlayerFromBoard(
@@ -553,13 +691,19 @@ export async function unassignPlayerFromBoard(
     ),
   );
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
+  if (typeof db.$queryRaw === "function" && typeof db.$executeRawUnsafe === "function") {
+    const current = await getBoard(boardId, db);
+    if (current) {
+      await persistBucketGroups(boardId, setPlayerGroup(current.buckets, playerId, "", null), db);
+    }
+  }
   return true;
 }
 
 export async function updateBoardPlayerNotes(
   boardId: string,
   playerId: string,
-  notes: string | null,
+  input: { notes?: string | null; favorited?: boolean },
   db: PrismaClient = prisma,
 ) {
   const assignment = await db.boardPlayer.findUnique({
@@ -583,14 +727,29 @@ export async function updateBoardPlayerNotes(
     return null;
   }
 
-  const updated = await db.boardPlayer.update({
-    where: { id: assignment.id },
-    data: { notes },
-  });
+  if (input.notes !== undefined) {
+    await db.boardPlayer.update({
+      where: { id: assignment.id },
+      data: { notes: input.notes },
+    });
+  }
+  if (input.favorited !== undefined) {
+    await db.$executeRaw`
+      UPDATE "BoardPlayer"
+      SET "favorited" = ${input.favorited}, "updatedAt" = ${new Date()}
+      WHERE id = ${assignment.id} AND "boardId" = ${boardId}
+    `;
+  }
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
+  const flag = await db.$queryRaw<Array<{ favorited: boolean; notes: string | null }>>`
+    SELECT "favorited", notes
+    FROM "BoardPlayer"
+    WHERE id = ${assignment.id}
+  `;
   return serializeAssignment({
     ...assignment,
-    notes: updated.notes,
+    notes: input.notes !== undefined ? input.notes : (flag[0]?.notes ?? assignment.notes),
+    favorited: flag[0]?.favorited ?? input.favorited ?? false,
   });
 }
 
@@ -601,6 +760,13 @@ export async function clearBoardPlayers(boardId: string, db: PrismaClient = pris
   }
 
   await db.boardPlayer.deleteMany({ where: { boardId } });
+  if (typeof db.$executeRawUnsafe === "function") {
+    await db.$executeRawUnsafe(
+      `UPDATE "Bucket" SET "groups" = '[]'::jsonb, "updatedAt" = $1 WHERE "boardId" = $2`,
+      new Date(),
+      boardId,
+    );
+  }
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
   return true;
 }
@@ -689,4 +855,79 @@ export async function bulkUpdateBoardPlayers(
   );
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
   return { ok: true as const };
+}
+
+export async function clearBoardFavorites(boardId: string, db: PrismaClient = prisma) {
+  const board = await db.board.findUnique({ where: { id: boardId }, select: { id: true } });
+  if (!board) {
+    return false;
+  }
+  if (typeof db.$executeRaw === "function") {
+    await db.$executeRaw`
+      UPDATE "BoardPlayer"
+      SET "favorited" = false, "updatedAt" = ${new Date()}
+      WHERE "boardId" = ${boardId}
+    `;
+  }
+  await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
+  return true;
+}
+
+export async function createBoardGroup(
+  boardId: string,
+  input: CreateBucketGroupInput,
+  db: PrismaClient = prisma,
+) {
+  const board = await getBoard(boardId, db);
+  if (!board) {
+    return { ok: false as const, reason: "board" };
+  }
+  const onBoard = new Set(
+    board.buckets.flatMap((bucket) => bucket.players.map((player) => player.playerId)),
+  );
+  const playerIds = input.playerIds.filter((id) => onBoard.has(id));
+  const group = {
+    id: crypto.randomUUID(),
+    name: input.name,
+    color: input.color,
+    playerIds,
+  };
+  const buckets = addBoardGroup(board.buckets, group);
+  await persistBucketGroups(boardId, buckets, db);
+  return { ok: true as const, group };
+}
+
+export async function patchBoardGroup(
+  boardId: string,
+  groupId: string,
+  input: UpdateBucketGroupInput,
+  db: PrismaClient = prisma,
+) {
+  const board = await getBoard(boardId, db);
+  if (!board) {
+    return { ok: false as const, reason: "board" };
+  }
+  if (!board.buckets.some((bucket) => bucket.groups.some((group) => group.id === groupId))) {
+    return { ok: false as const, reason: "group" };
+  }
+  const buckets = updateBucketGroup(board.buckets, groupId, input);
+  await persistBucketGroups(boardId, buckets, db);
+  return { ok: true as const, buckets };
+}
+
+export async function removeBoardGroup(
+  boardId: string,
+  groupId: string,
+  db: PrismaClient = prisma,
+) {
+  const board = await getBoard(boardId, db);
+  if (!board) {
+    return { ok: false as const, reason: "board" };
+  }
+  if (!board.buckets.some((bucket) => bucket.groups.some((group) => group.id === groupId))) {
+    return { ok: false as const, reason: "group" };
+  }
+  const buckets = deleteBucketGroup(board.buckets, groupId);
+  await persistBucketGroups(boardId, buckets, db);
+  return { ok: true as const, buckets };
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "Bucket" ADD COLUMN IF NOT EXISTS "groups" JSONB NOT NULL DEFAULT '[]'::jsonb;

@@ -15,6 +15,7 @@ import { fetchMockDraftSnapshot } from "@/lib/sleeper/tracker/client";
 import { diffDraftPicks } from "@/lib/sleeper/tracker/diff";
 import { playerLabel, playerMeta } from "@/lib/sleeper/tracker/parser";
 import { createDraftPoller } from "@/lib/sleeper/tracker/polling";
+import { STICKY_TH_CLASS } from "@/components/ui/StickyTable";
 import type { DraftDiff, DraftPick, DraftSnapshot } from "@/lib/sleeper/tracker/types";
 
 type TrackedPick = DraftPick & { detectedAt: string };
@@ -377,17 +378,17 @@ export function MockDraftTracker() {
         </div>
       ) : null}
 
-      <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="max-h-[min(70dvh,36rem)] overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+        <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
+          <thead>
             <tr>
-              <th className="px-3 py-2 font-medium">Pick</th>
-              <th className="px-3 py-2 font-medium">Player</th>
-              <th className="px-3 py-2 font-medium">Player ID</th>
-              <th className="px-3 py-2 font-medium">Pos</th>
-              <th className="px-3 py-2 font-medium">Team</th>
-              <th className="px-3 py-2 font-medium">Picked By</th>
-              <th className="px-3 py-2 font-medium">Detected</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Pick</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Player</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Player ID</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Pos</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Team</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Picked By</th>
+              <th className={`${STICKY_TH_CLASS} px-3 py-2 text-left font-medium`}>Detected</th>
             </tr>
           </thead>
           <tbody>

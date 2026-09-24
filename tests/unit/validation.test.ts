@@ -5,6 +5,7 @@ import {
   createBucketSchema,
   nextAlternatingTierColor,
   playerSearchSchema,
+  updateBoardPlayerNotesSchema,
   TIER_COLOR_GRAPHITE,
   TIER_COLOR_GRAY,
 } from "@/lib/validation";
@@ -86,6 +87,17 @@ describe("validation", () => {
   it("allows an empty player search", () => {
     const result = playerSearchSchema.safeParse({ query: "" });
     expect(result.success).toBe(true);
+  });
+
+  it("accepts a favorite-only board player update", () => {
+    expect(updateBoardPlayerNotesSchema.parse({ favorited: true })).toEqual({
+      notes: undefined,
+      favorited: true,
+    });
+    expect(updateBoardPlayerNotesSchema.parse({ notes: "  keep  " })).toEqual({
+      notes: "keep",
+      favorited: undefined,
+    });
   });
 });
 
