@@ -70,6 +70,19 @@ export function moveBoardPlayers(
   });
 }
 
+export function setBoardPlayerNotes(
+  buckets: BoardBucket[],
+  playerId: string,
+  notes: string | null,
+): BoardBucket[] {
+  return buckets.map((bucket) => ({
+    ...bucket,
+    players: bucket.players.map((player) =>
+      player.playerId === playerId ? { ...player, notes } : player,
+    ),
+  }));
+}
+
 export function clearBoardPlayers(buckets: BoardBucket[]): BoardBucket[] {
   return buckets.map((bucket) => ({ ...bucket, players: [] }));
 }

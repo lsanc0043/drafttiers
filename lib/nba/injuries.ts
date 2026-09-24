@@ -16,7 +16,7 @@ const ESPN_TEAM_TO_NBA: Record<string, string> = {
 
 const HEALTHY_STATUSES = new Set(["probable", "available", "active", "healthy"]);
 
-export type InjuryLabel = "GTD" | "OUT";
+export type InjuryLabel = "GTD" | "DTD" | "OUT";
 
 export type InjuryRecord = {
   nameKey: string;
@@ -83,6 +83,15 @@ export function injuryStatusLabel(status: string | null | undefined): InjuryLabe
     normalized === "ofs"
   ) {
     return "OUT";
+  }
+  if (
+    normalized === "dtd" ||
+    normalized === "day-to-day" ||
+    normalized === "day to day" ||
+    normalized.includes("day-to-day") ||
+    normalized.includes("day to day")
+  ) {
+    return "DTD";
   }
   return "GTD";
 }

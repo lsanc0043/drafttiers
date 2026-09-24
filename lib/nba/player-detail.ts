@@ -1,10 +1,11 @@
 import type { PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
-import { gameLogBucket, mergeSeasonGameLog } from "@/lib/nba/game-log";
+import { gameLogBucket, likelySeasonTeams, mergeSeasonGameLog } from "@/lib/nba/game-log";
 import { scoreFantasyGame } from "@/lib/nba/fantasy";
 import { getInjuryIndex, getPlayerInjury } from "@/lib/nba/injuries";
 import { teamUsageMap, teamUsageTotals } from "@/lib/nba/players";
-import { FANTASY_AVERAGE_SEASON, gameLogDateRange, isRookieForLeagueYear } from "@/lib/nba/season";
+import { FANTASY_AVERAGE_SEASON, GAME_LOG_SEASONS, gameLogDateRange, isRookieForLeagueYear } from "@/lib/nba/season";
 import { usageRateFromPerGame } from "@/lib/nba/usage";
 
 type SeasonStatRow = {
@@ -110,45 +111,7 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
         AND "gameDate" < ${seasonEnd}
       ORDER BY "gameDate" DESC
     `,
-    db.$queryRaw<TeamGameRow[]>`
-      WITH inferred_teams AS (
-        SELECT tg."teamId", tg."season"
-        FROM "PlayerGameLog" gl
-        INNER JOIN "TeamGame" tg ON tg."gameId" = gl."gameId"
-        WHERE gl."playerId" = ${player.id}
-          AND gl."gameDate" >= ${seasonStart}
-          AND gl."gameDate" < ${seasonEnd}
-        GROUP BY tg."teamId", tg."season"
-        HAVING COUNT(*) > 7
-      ),
-      season_teams AS (
-        SELECT "teamId", "season" FROM inferred_teams
-        UNION ALL
-        SELECT ${teamId} AS "teamId", s."season"
-        FROM (VALUES ('2025-26'), ('2026-27')) AS s("season")
-        WHERE ${teamId} IS NOT NULL
-          AND NOT EXISTS (SELECT 1 FROM inferred_teams)
-      )
-      SELECT DISTINCT ON (tg."gameId")
-        tg."gameId",
-        tg."gameDate",
-        COALESCE(tg_opp."teamAbbr", opp_p."teamAbbr") AS "opponentAbbr"
-      FROM "TeamGame" tg
-      INNER JOIN season_teams st
-        ON st."teamId" = tg."teamId"
-       AND st."season" = tg."season"
-      LEFT JOIN "TeamGame" tg_opp
-        ON tg_opp."gameId" = tg."gameId"
-       AND tg_opp."teamId" <> tg."teamId"
-      LEFT JOIN "PlayerGameLog" opp_gl
-        ON opp_gl."gameId" = tg."gameId"
-      LEFT JOIN "Player" opp_p
-        ON opp_p.id = opp_gl."playerId"
-       AND opp_p."teamId" IS DISTINCT FROM tg."teamId"
-      WHERE tg."gameDate" >= ${seasonStart}
-        AND tg."gameDate" < ${seasonEnd}
-      ORDER BY tg."gameId", tg_opp."teamAbbr", opp_p."teamAbbr"
-    `,
+    loadTeamSchedule(db, player.id, teamId, seasonStart, seasonEnd),
     teamUsageTotals(db, FANTASY_AVERAGE_SEASON),
     getInjuryIndex(),
   ]);
@@ -243,6 +206,52 @@ export async function getPlayerDetail(id: string, db: PrismaClient = prisma) {
       games: fantasySeasonGames,
     },
   };
+}
+
+function loadTeamSchedule(
+  db: PrismaClient,
+  playerId: string,
+  teamId: number | null,
+  seasonStart: Date,
+  seasonEnd: Date,
+) {
+  return (async () => {
+    const counts = await db.$queryRaw<Array<{ teamId: number; season: string; games: number }>>`
+      SELECT tg."teamId", tg."season", COUNT(*)::int AS games
+      FROM "PlayerGameLog" gl
+      INNER JOIN "TeamGame" tg ON tg."gameId" = gl."gameId"
+      WHERE gl."playerId" = ${playerId}
+        AND gl."gameDate" >= ${seasonStart}
+        AND gl."gameDate" < ${seasonEnd}
+      GROUP BY tg."teamId", tg."season"
+    `;
+    const seasonTeams = likelySeasonTeams(counts, {
+      currentTeamId: teamId,
+      seasons: GAME_LOG_SEASONS,
+    });
+    if (seasonTeams.length === 0) {
+      return [] as TeamGameRow[];
+    }
+    const tuples = Prisma.join(
+      seasonTeams.map((row) => Prisma.sql`(${row.teamId}, ${row.season})`),
+    );
+    return db.$queryRaw<TeamGameRow[]>`
+      SELECT DISTINCT ON (tg."gameId")
+        tg."gameId",
+        tg."gameDate",
+        tg_opp."teamAbbr" AS "opponentAbbr"
+      FROM "TeamGame" tg
+      INNER JOIN (VALUES ${tuples}) AS st("teamId", "season")
+        ON st."teamId" = tg."teamId"
+       AND st."season" = tg."season"
+      LEFT JOIN "TeamGame" tg_opp
+        ON tg_opp."gameId" = tg."gameId"
+       AND tg_opp."teamId" <> tg."teamId"
+      WHERE tg."gameDate" >= ${seasonStart}
+        AND tg."gameDate" < ${seasonEnd}
+      ORDER BY tg."gameId", tg_opp."teamAbbr"
+    `;
+  })();
 }
 
 function toBox(game: GameLogRow) {

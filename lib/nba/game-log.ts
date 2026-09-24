@@ -134,6 +134,55 @@ export type TeamGameEntry = {
   opponentAbbr?: string | null;
 };
 
+export type TeamGameCount = {
+  teamId: number;
+  season: string;
+  games: number;
+};
+
+export function likelySeasonTeams(
+  counts: TeamGameCount[],
+  options?: {
+    currentTeamId?: number | null;
+    seasons?: readonly string[];
+  },
+): Array<{ teamId: number; season: string }> {
+  const maxBySeason = new Map<string, number>();
+  for (const row of counts) {
+    const games = Number(row.games) || 0;
+    maxBySeason.set(row.season, Math.max(maxBySeason.get(row.season) ?? 0, games));
+  }
+
+  const selected = new Map<string, { teamId: number; season: string }>();
+  function add(teamId: number, season: string) {
+    if (!Number.isInteger(teamId) || teamId <= 0 || !season) {
+      return;
+    }
+    selected.set(`${teamId}:${season}`, { teamId, season });
+  }
+
+  for (const row of counts) {
+    const games = Number(row.games) || 0;
+    const max = maxBySeason.get(row.season) ?? 0;
+    if (games <= 0 || max <= 0) {
+      continue;
+    }
+    if (games === max || (games > 7 && games >= max * 0.3)) {
+      add(Number(row.teamId), row.season);
+    }
+  }
+
+  const currentTeamId = options?.currentTeamId;
+  if (currentTeamId != null) {
+    const seasons = options?.seasons?.length ? options.seasons : [...maxBySeason.keys()];
+    for (const season of seasons) {
+      add(currentTeamId, season);
+    }
+  }
+
+  return [...selected.values()];
+}
+
 const EMPTY_BOX = {
   minutes: 0,
   points: 0,
@@ -200,8 +249,39 @@ export function formatGameLogMatchup(
   return opponent ? `${date} vs ${opponent}` : date;
 }
 
+export const GAME_LOG_FPTS_GREEN_BELOW = 5;
+export const GAME_LOG_FPTS_YELLOW_BELOW = 15;
+
+function toneFromDelta(
+  delta: number,
+  greenBelow: number,
+  yellowBelow: number,
+): "above" | "average" | "below" {
+  if (delta >= -greenBelow) {
+    return "above";
+  }
+  if (delta >= -yellowBelow) {
+    return "average";
+  }
+  return "below";
+}
+
+function scaledBands(statAverage: number, fptsAverage: number | null | undefined) {
+  const reference =
+    fptsAverage != null && Number.isFinite(fptsAverage) && fptsAverage > 0
+      ? fptsAverage
+      : statAverage > 0
+        ? statAverage
+        : 1;
+  const scale = statAverage > 0 ? statAverage / reference : 0;
+  return {
+    greenBelow: GAME_LOG_FPTS_GREEN_BELOW * scale,
+    yellowBelow: GAME_LOG_FPTS_YELLOW_BELOW * scale,
+  };
+}
+
 export function gameLogRowTone(
-  fantasyPoints: number | null,
+  value: number | null,
   average: number | null,
   didNotPlay: boolean,
 ): "dnp" | "above" | "average" | "below" | null {
@@ -209,21 +289,41 @@ export function gameLogRowTone(
     return "dnp";
   }
   if (
-    fantasyPoints == null ||
+    value == null ||
     average == null ||
-    !Number.isFinite(fantasyPoints) ||
+    !Number.isFinite(value) ||
     !Number.isFinite(average)
   ) {
     return null;
   }
-  const delta = fantasyPoints - average;
-  if (delta > 2) {
-    return "above";
+  return toneFromDelta(
+    value - average,
+    GAME_LOG_FPTS_GREEN_BELOW,
+    GAME_LOG_FPTS_YELLOW_BELOW,
+  );
+}
+
+export function gameLogStatTone(
+  value: number | null,
+  average: number | null,
+  didNotPlay: boolean,
+  invert = false,
+  fptsAverage?: number | null,
+) {
+  if (didNotPlay) {
+    return "dnp";
   }
-  if (delta < -2) {
-    return "below";
+  if (
+    value == null ||
+    average == null ||
+    !Number.isFinite(value) ||
+    !Number.isFinite(average)
+  ) {
+    return null;
   }
-  return "average";
+  const { greenBelow, yellowBelow } = scaledBands(average, fptsAverage);
+  const delta = invert ? average - value : value - average;
+  return toneFromDelta(delta, greenBelow, yellowBelow);
 }
 
 export function gameLogRowClassName(tone: ReturnType<typeof gameLogRowTone>) {

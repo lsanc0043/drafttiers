@@ -7,6 +7,7 @@ export function isRookieForLeagueYear(fromYear: number | null | undefined, today
 }
 
 export const FANTASY_AVERAGE_SEASON = "2025-26";
+export const LOCK_IN_SEASON = "2026-27";
 export const GAME_LOG_SEASONS = ["2025-26", "2026-27"] as const;
 export type GameLogSeason = (typeof GAME_LOG_SEASONS)[number];
 

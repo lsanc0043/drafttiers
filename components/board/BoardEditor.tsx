@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { BoardPlayerChip } from "@/components/board/BoardPlayerChip";
 import { DraftBoardCanvas } from "@/components/board/DraftBoardCanvas";
 import { DraftSettingsModal } from "@/components/board/DraftSettingsModal";
@@ -11,14 +11,17 @@ import { BucketColumn } from "@/components/buckets/BucketColumn";
 import { type PlayerCardData } from "@/components/players/PlayerCard";
 import { PlayerDirectory } from "@/components/players/PlayerDirectory";
 import { PlayerModal } from "@/components/players/PlayerModal";
+import { LockInExplorer } from "@/components/statdunk/LockInExplorer";
 import { useFantasyScoring } from "@/hooks/useFantasyScoring";
 import { useSleeperLivePicks } from "@/hooks/useSleeperLivePicks";
-import { placeBoardPlayer, removeBoardPlayer, removeBoardPlayers, moveBoardPlayers, clearBoardPlayers } from "@/lib/board-players";
+import { placeBoardPlayer, removeBoardPlayer, removeBoardPlayers, moveBoardPlayers, clearBoardPlayers, setBoardPlayerNotes } from "@/lib/board-players";
+import type { LockInBundle } from "@/lib/statdunk/load";
 import { nextAlternatingTierColor, type DraftSettingsInput } from "@/lib/validation";
 import type { BoardBucket, BoardBucketPlayer, BoardDetail } from "@/types";
 
 type BoardEditorProps = {
   boardId: string;
+  lockIn?: LockInBundle | null;
 };
 
 function toBoardPlayer(player: PlayerCardData, existing?: BoardBucketPlayer): BoardBucketPlayer {
@@ -36,6 +39,7 @@ function toBoardPlayer(player: PlayerCardData, existing?: BoardBucketPlayer): Bo
     jerseyNumber: player.jerseyNumber,
     isActive: player.isActive,
     sortOrder: 0,
+    notes: null,
   };
 }
 
@@ -53,7 +57,7 @@ function toPlayerCard(player: BoardBucketPlayer): PlayerCardData {
   };
 }
 
-export function BoardEditor({ boardId }: BoardEditorProps) {
+export function BoardEditor({ boardId, lockIn = null }: BoardEditorProps) {
   const [board, setBoard] = useState<BoardDetail | null>(null);
   const [title, setTitle] = useState("");
   const [editingTitle, setEditingTitle] = useState(false);
@@ -63,6 +67,9 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [browseOpen, setBrowseOpen] = useState(false);
+  const [browseCatalog, setBrowseCatalog] = useState<"lock-in" | "last-season">("lock-in");
+  const [browseWidthPct, setBrowseWidthPct] = useState(50);
+  const splitRef = useRef<HTMLDivElement>(null);
   const [selecting, setSelecting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerCardData | null>(null);
@@ -129,6 +136,28 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
       titleInputRef.current?.select();
     }
   }, [editingTitle]);
+
+  function clampBrowseWidth(percent: number) {
+    return Math.min(90, Math.max(50, percent));
+  }
+
+  function setBrowseWidthFromClientX(clientX: number) {
+    const split = splitRef.current;
+    if (!split) {
+      return;
+    }
+    const box = split.getBoundingClientRect();
+    if (box.width <= 0) {
+      return;
+    }
+    setBrowseWidthPct(clampBrowseWidth(((box.right - clientX) / box.width) * 100));
+  }
+
+  function onBrowseResizePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setBrowseWidthFromClientX(event.clientX);
+  }
 
   async function saveTitle(nextName: string) {
     const name = nextName.trim();
@@ -305,6 +334,36 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
       setBoard(previous);
       setError("Could not remove player from board");
       return;
+    }
+    setError(null);
+  }
+
+  async function onSaveNotes(playerId: string, notes: string | null) {
+    if (!board) {
+      return;
+    }
+    const previous = board;
+    setBoard({ ...board, buckets: setBoardPlayerNotes(board.buckets, playerId, notes) });
+    const response = await fetch(`/api/boards/${board.id}/players/${playerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notes }),
+    });
+    if (!response.ok) {
+      setBoard(previous);
+      setError("Could not save note");
+      throw new Error("Could not save note");
+    }
+    const payload = (await response.json()) as { player?: BoardBucketPlayer };
+    if (payload.player) {
+      setBoard((current) =>
+        current
+          ? {
+              ...current,
+              buckets: setBoardPlayerNotes(current.buckets, playerId, payload.player?.notes ?? null),
+            }
+          : current,
+      );
     }
     setError(null);
   }
@@ -566,6 +625,7 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
                       )
                     }
                     onRemove={() => void onRemovePlayer(player.playerId)}
+                    onSaveNotes={(notes) => onSaveNotes(player.playerId, notes)}
                     onDropRelative={(dropped, side) => {
                       if (side === "before") {
                         void onDropPlayer(bucket.id, dropped, player.playerId);
@@ -592,29 +652,118 @@ export function BoardEditor({ boardId }: BoardEditorProps) {
   return (
     <>
       <div
+        ref={splitRef}
         className={
           browseOpen
-            ? "flex h-[calc(100dvh-5.5rem)] min-h-0 gap-4"
+            ? "flex h-[calc(100dvh-5.5rem)] min-h-0"
             : undefined
         }
       >
-        <div className={browseOpen ? "min-h-0 w-1/2 overflow-y-auto pr-1" : undefined}>
+        <div
+          className={browseOpen ? "min-h-0 min-w-0 flex-1 overflow-y-auto pr-1" : undefined}
+        >
           {boardPane}
         </div>
         {browseOpen ? (
-          <aside className="flex min-h-0 w-1/2 min-w-0 flex-col overflow-hidden border-l border-zinc-200 pl-4 dark:border-zinc-800">
-            <PlayerDirectory
-              variant="panel"
-              draggable
-              excludedPlayerIds={
-                new Set(
-                  board.buckets.flatMap((bucket) =>
-                    bucket.players.map((player) => player.playerId),
-                  ),
-                )
-              }
+          <>
+            <button
+              type="button"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize player browser"
+              aria-valuemin={50}
+              aria-valuemax={90}
+              aria-valuenow={Math.round(browseWidthPct)}
+              onPointerDown={onBrowseResizePointerDown}
+              onPointerMove={(event) => {
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                  setBrowseWidthFromClientX(event.clientX);
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowLeft") {
+                  event.preventDefault();
+                  setBrowseWidthPct((current) => clampBrowseWidth(current + 2));
+                } else if (event.key === "ArrowRight") {
+                  event.preventDefault();
+                  setBrowseWidthPct((current) => clampBrowseWidth(current - 2));
+                } else if (event.key === "Home") {
+                  event.preventDefault();
+                  setBrowseWidthPct(50);
+                } else if (event.key === "End") {
+                  event.preventDefault();
+                  setBrowseWidthPct(90);
+                }
+              }}
+              className="w-1.5 shrink-0 cursor-col-resize self-stretch border-0 bg-zinc-200 hover:bg-zinc-400 dark:bg-zinc-800 dark:hover:bg-zinc-500"
             />
-          </aside>
+            <aside
+              className="flex min-h-0 shrink-0 flex-col overflow-hidden pl-3"
+              style={{ width: `${browseWidthPct}%`, minWidth: "50%" }}
+            >
+            <div className="mb-3 flex shrink-0 gap-1 rounded-lg border border-zinc-300 p-0.5 dark:border-zinc-700">
+              <button
+                type="button"
+                aria-pressed={browseCatalog === "lock-in"}
+                onClick={() => setBrowseCatalog("lock-in")}
+                className={`flex-1 rounded-md px-3 py-1.5 text-sm ${
+                  browseCatalog === "lock-in"
+                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                    : "text-zinc-600 dark:text-zinc-300"
+                }`}
+              >
+                Lock In
+              </button>
+              <button
+                type="button"
+                aria-pressed={browseCatalog === "last-season"}
+                onClick={() => setBrowseCatalog("last-season")}
+                className={`flex-1 rounded-md px-3 py-1.5 text-sm ${
+                  browseCatalog === "last-season"
+                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                    : "text-zinc-600 dark:text-zinc-300"
+                }`}
+              >
+                Last season
+              </button>
+            </div>
+            {browseCatalog === "lock-in" ? (
+              lockIn ? (
+                <LockInExplorer
+                  variant="panel"
+                  draggable
+                  dataset={lockIn.dataset}
+                  photoIds={lockIn.photoIds}
+                  directoryPlayers={lockIn.directoryPlayers}
+                  injuries={lockIn.injuries}
+                  excludedPlayerIds={
+                    new Set(
+                      board.buckets.flatMap((bucket) =>
+                        bucket.players.map((player) => player.playerId),
+                      ),
+                    )
+                  }
+                />
+              ) : (
+                <p className="text-sm text-zinc-500">
+                  No Lock-In dataset found. Run `pnpm scrape:statdunk` to populate this view.
+                </p>
+              )
+            ) : (
+              <PlayerDirectory
+                variant="panel"
+                draggable
+                excludedPlayerIds={
+                  new Set(
+                    board.buckets.flatMap((bucket) =>
+                      bucket.players.map((player) => player.playerId),
+                    ),
+                  )
+                }
+              />
+            )}
+            </aside>
+          </>
         ) : null}
       </div>
 
