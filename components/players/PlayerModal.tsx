@@ -5,7 +5,9 @@ import {
   InjuryBadge,
   type PlayerCardData,
 } from "@/components/players/PlayerCard";
+import { PlayerNewsTab } from "@/components/players/PlayerNewsTab";
 import { PlayerPhoto } from "@/components/players/PlayerPhoto";
+import { PlayerTeamTab } from "@/components/players/PlayerTeamTab";
 import {
   averageFantasyPoints,
   scoreFantasyGame,
@@ -19,6 +21,7 @@ import {
   gameLogRowClassName,
   gameLogRowTone,
   gameLogSliceKey,
+  gameLogStatTone,
   parseGameLogSliceKey,
 } from "@/lib/nba/game-log";
 import { GAME_LOG_SEASONS } from "@/lib/nba/season";
@@ -34,7 +37,7 @@ type GameLogRow = {
   blocks: number;
   turnovers: number;
   threePointersMade: number;
-  fantasyPoints?: number;
+  fantasyPoints?: number | null;
   didNotPlay?: boolean;
   opponentAbbr?: string | null;
 };
@@ -71,9 +74,12 @@ type PlayerDetailResponse = {
   };
 };
 
+type ModalTab = "log" | "news" | "team";
+
 type PlayerModalProps = {
   player: PlayerCardData;
   scoring: FantasyScoring;
+  sleeperPlayerId?: string | null;
   onEditScoring?: () => void;
   onClose: () => void;
 };
@@ -85,12 +91,52 @@ function formatStat(value: number | null | undefined, digits = 1) {
   return value.toFixed(digits);
 }
 
+function mean(
+  games: Array<GameLogRow & { fantasyPoints: number | null; didNotPlay: boolean }>,
+  pick: (game: GameLogRow) => number,
+) {
+  const played = games.filter((game) => !game.didNotPlay);
+  if (played.length === 0) {
+    return null;
+  }
+  return played.reduce((sum, game) => sum + pick(game), 0) / played.length;
+}
+
+function StatBadge({
+  value,
+  average,
+  didNotPlay,
+  digits = 0,
+  invert = false,
+  fpts = false,
+  fptsAverage = null,
+}: {
+  value: number | null | undefined;
+  average: number | null;
+  didNotPlay: boolean;
+  digits?: number;
+  invert?: boolean;
+  fpts?: boolean;
+  fptsAverage?: number | null;
+}) {
+  if (didNotPlay) {
+    return "—";
+  }
+  const tone = fpts
+    ? gameLogRowTone(value ?? null, average, false)
+    : gameLogStatTone(value ?? null, average, false, invert, fptsAverage);
+  return <span className={gameLogRowClassName(tone)}>{formatStat(value, digits)}</span>;
+}
+
 export function PlayerModal({
-  player,
+  player: initialPlayer,
   scoring,
+  sleeperPlayerId,
   onEditScoring,
   onClose,
 }: PlayerModalProps) {
+  const [player, setPlayer] = useState(initialPlayer);
+  const [tab, setTab] = useState<ModalTab>("log");
   const [detail, setDetail] = useState<PlayerDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -98,6 +144,42 @@ export function PlayerModal({
     playerId: string;
     slice: string;
   } | null>(null);
+  const [lockInTeam, setLockInTeam] = useState<{ teamAbbr: string; teamName: string } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    setPlayer(initialPlayer);
+    setTab("log");
+    setLockInTeam(null);
+  }, [initialPlayer.id]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams();
+    if (player.nbaPersonId) {
+      params.set("nbaPersonId", String(player.nbaPersonId));
+    }
+    if (player.fullName) {
+      params.set("name", player.fullName);
+    }
+    fetch(`/api/lock-in/roster?${params.toString()}`, { signal: controller.signal })
+      .then(async (response) => {
+        const payload = (await response.json()) as {
+          team?: string;
+          teamName?: string;
+        };
+        if (!response.ok || !payload.team) {
+          return;
+        }
+        setLockInTeam({
+          teamAbbr: payload.team,
+          teamName: payload.teamName ?? payload.team,
+        });
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [player.fullName, player.nbaPersonId]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -118,6 +200,7 @@ export function PlayerModal({
 
   useEffect(() => {
     const controller = new AbortController();
+    setDetail(null);
     fetch(`/api/players/${player.id}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
@@ -176,7 +259,7 @@ export function PlayerModal({
     }
   }
 
-  const team = player.teamName ?? player.teamAbbr ?? "Free agent";
+  const team = lockInTeam?.teamName ?? player.teamName ?? player.teamAbbr ?? "Free agent";
   const position = player.position ?? "Unknown";
   const isInjured = detail?.player.isInjured ?? player.isInjured;
   const injuryLabel = detail?.player.injuryLabel ?? player.injuryLabel;
@@ -230,6 +313,23 @@ export function PlayerModal({
     scoring,
   );
   const hasPlayedGames = allGames.some((game) => !game.didNotPlay);
+  const averages = {
+    min: mean(seasonGames, (game) => game.minutes),
+    pts: mean(seasonGames, (game) => game.points),
+    reb: mean(seasonGames, (game) => game.rebounds),
+    ast: mean(seasonGames, (game) => game.assists),
+    stl: mean(seasonGames, (game) => game.steals),
+    blk: mean(seasonGames, (game) => game.blocks),
+    tov: mean(seasonGames, (game) => game.turnovers),
+  };
+  const currentSleeperId =
+    player.id === initialPlayer.id ? sleeperPlayerId : null;
+
+  const tabs: Array<{ id: ModalTab; label: string }> = [
+    { id: "log", label: "Game log" },
+    { id: "news", label: "News" },
+    { id: "team", label: "Team" },
+  ];
 
   return (
     <div className="fixed inset-0 z-60 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
@@ -347,8 +447,23 @@ export function PlayerModal({
 
           <section className="flex min-w-0 flex-col text-left md:min-h-0 md:flex-1 md:overflow-hidden">
             <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold">Game log</h3>
-              {hasPlayedGames ? (
+              <div className="flex gap-1 rounded-lg border border-zinc-300 p-0.5 dark:border-zinc-700">
+                {tabs.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setTab(item.id)}
+                    className={`rounded-md px-3 py-1 text-sm ${
+                      tab === item.id
+                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                        : "text-zinc-600 dark:text-zinc-300"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              {tab === "log" && hasPlayedGames ? (
                 <div className="flex items-center gap-2">
                   <label className="sr-only" htmlFor="game-log-slice">
                     Season and competition
@@ -387,7 +502,7 @@ export function PlayerModal({
                     </button>
                   ) : null}
                 </div>
-              ) : onEditScoring ? (
+              ) : tab === "log" && onEditScoring ? (
                 <button
                   type="button"
                   onClick={onEditScoring}
@@ -397,51 +512,53 @@ export function PlayerModal({
                 </button>
               ) : null}
             </div>
-            {!detail ? (
+
+            {tab === "news" ? (
+              <PlayerNewsTab
+                fullName={player.fullName}
+                teamAbbr={lockInTeam?.teamAbbr ?? player.teamAbbr}
+                sleeperPlayerId={currentSleeperId}
+              />
+            ) : null}
+
+            {tab === "team" ? (
+              <PlayerTeamTab player={player} onSelect={setPlayer} />
+            ) : null}
+
+            {tab === "log" && !detail ? (
               <p className="mt-2 text-sm text-zinc-500">Loading games...</p>
-            ) : !hasPlayedGames ? (
+            ) : null}
+            {tab === "log" && detail && !hasPlayedGames ? (
               <p className="mt-2 text-sm text-zinc-500">
                 No games were found for this player.
               </p>
-            ) : seasonGames.length ? (
+            ) : null}
+            {tab === "log" && detail && hasPlayedGames && seasonGames.length ? (
               <div className="mt-2 overflow-x-auto md:min-h-0 md:flex-1 md:overflow-auto">
                 <table className="w-full min-w-lg text-left text-sm">
                   <thead className="sticky top-0 bg-background text-zinc-300">
                     <tr>
-                      {[
-                        "Date",
-                        "MIN",
-                        "PTS",
-                        "REB",
-                        "AST",
-                        "STL",
-                        "BLK",
-                        "TOV",
-                        "3PM",
-                        "FPTS",
-                      ].map((header) => (
-                        <th
-                          key={header}
-                          className={`py-2 pr-2 font-medium ${header === "Date" ? "text-left" : "text-center"}`}
-                        >
-                          {header}
-                        </th>
-                      ))}
+                      {["Date", "FPTS", "MIN", "PTS", "REB", "AST", "STL", "BLK", "TO"].map(
+                        (header) => (
+                          <th
+                            key={header}
+                            className={`py-2 pr-2 font-medium ${header === "Date" ? "text-left" : "text-center"}`}
+                          >
+                            {header}
+                          </th>
+                        ),
+                      )}
                     </tr>
                   </thead>
                   <tbody>
                     {seasonGames.map((game) => {
-                      const tone = gameLogRowTone(
-                        game.fantasyPoints,
-                        visibleFantasyAverage,
-                        Boolean(game.didNotPlay),
-                      );
+                      const dnp = Boolean(game.didNotPlay);
                       return (
                         <tr
                           key={game.gameId}
                           className="border-t border-zinc-200 dark:border-zinc-800"
                           title={
-                            game.didNotPlay
+                            dnp
                               ? "Did not play"
                               : visibleFantasyAverage == null
                                 ? undefined
@@ -454,28 +571,72 @@ export function PlayerModal({
                               game.opponentAbbr,
                             )}
                           </td>
-                          {[
-                            formatStat(game.minutes, 0),
-                            game.points,
-                            game.rebounds,
-                            game.assists,
-                            game.steals,
-                            game.blocks,
-                            game.turnovers,
-                            game.threePointersMade,
-                          ].map((value, index) => (
-                            <td key={index} className="py-2 pr-2 text-center">
-                              {game.didNotPlay ? "—" : value}
-                            </td>
-                          ))}
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.fantasyPoints}
+                              average={visibleFantasyAverage}
+                              didNotPlay={dnp}
+                              digits={1}
+                              fpts
+                            />
+                          </td>
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.minutes}
+                              average={averages.min}
+                              didNotPlay={dnp}
+                              digits={0}
+                              fptsAverage={visibleFantasyAverage}
+                            />
+                          </td>
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.points}
+                              average={averages.pts}
+                              didNotPlay={dnp}
+                              fptsAverage={visibleFantasyAverage}
+                            />
+                          </td>
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.rebounds}
+                              average={averages.reb}
+                              didNotPlay={dnp}
+                              fptsAverage={visibleFantasyAverage}
+                            />
+                          </td>
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.assists}
+                              average={averages.ast}
+                              didNotPlay={dnp}
+                              fptsAverage={visibleFantasyAverage}
+                            />
+                          </td>
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.steals}
+                              average={averages.stl}
+                              didNotPlay={dnp}
+                              fptsAverage={visibleFantasyAverage}
+                            />
+                          </td>
+                          <td className="py-2 pr-2 text-center">
+                            <StatBadge
+                              value={game.blocks}
+                              average={averages.blk}
+                              didNotPlay={dnp}
+                              fptsAverage={visibleFantasyAverage}
+                            />
+                          </td>
                           <td className="py-2 text-center">
-                            {game.didNotPlay ? (
-                              "—"
-                            ) : (
-                              <span className={gameLogRowClassName(tone)}>
-                                {formatStat(game.fantasyPoints, 1)}
-                              </span>
-                            )}
+                            <StatBadge
+                              value={game.turnovers}
+                              average={averages.tov}
+                              didNotPlay={dnp}
+                              invert
+                              fptsAverage={visibleFantasyAverage}
+                            />
                           </td>
                         </tr>
                       );
@@ -483,11 +644,12 @@ export function PlayerModal({
                   </tbody>
                 </table>
               </div>
-            ) : (
+            ) : null}
+            {tab === "log" && detail && hasPlayedGames && !seasonGames.length ? (
               <p className="mt-2 text-sm text-zinc-500">
                 No games in this season slice.
               </p>
-            )}
+            ) : null}
           </section>
         </div>
       </div>

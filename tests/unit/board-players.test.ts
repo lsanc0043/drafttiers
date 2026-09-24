@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { placeBoardPlayer, removeBoardPlayer, clearBoardPlayers, moveBoardPlayers } from "@/lib/board-players";
+import { placeBoardPlayer, removeBoardPlayer, clearBoardPlayers, moveBoardPlayers, setBoardPlayerNotes } from "@/lib/board-players";
 import type { BoardBucket, BoardBucketPlayer } from "@/types";
 
-function player(id: string, assignmentId: string, sortOrder: number): BoardBucketPlayer {
+function player(id: string, assignmentId: string, sortOrder: number, notes: string | null = null): BoardBucketPlayer {
   return {
     assignmentId,
     playerId: id,
@@ -14,6 +14,7 @@ function player(id: string, assignmentId: string, sortOrder: number): BoardBucke
     jerseyNumber: "15",
     isActive: true,
     sortOrder,
+    notes,
   };
 }
 
@@ -78,5 +79,14 @@ describe("clearBoardPlayers", () => {
     ];
 
     expect(clearBoardPlayers(buckets).map((item) => item.players)).toEqual([[], []]);
+  });
+});
+
+describe("setBoardPlayerNotes", () => {
+  it("updates and clears a player's note", () => {
+    const buckets = [bucket("S", [player("jokic", "a1", 0)])];
+    const withNote = setBoardPlayerNotes(buckets, "jokic", "keep him");
+    expect(withNote[0]?.players[0]?.notes).toBe("keep him");
+    expect(setBoardPlayerNotes(withNote, "jokic", null)[0]?.players[0]?.notes).toBeNull();
   });
 });

@@ -38,6 +38,7 @@ type AssignmentRecord = {
   bucketId: string;
   playerId: string;
   sortOrder: number;
+  notes?: string | null;
   player: {
     id: string;
     nbaPersonId: number;
@@ -62,6 +63,7 @@ function serializeAssignment(assignment: AssignmentRecord): BoardBucketPlayer {
     jerseyNumber: assignment.player.jerseyNumber,
     isActive: assignment.player.isActive,
     sortOrder: assignment.sortOrder,
+    notes: assignment.notes ?? null,
   };
 }
 
@@ -511,6 +513,7 @@ export async function assignPlayerToBucket(
       bucketId: input.bucketId,
       playerId: assignment.playerId,
       sortOrder,
+      notes: assignment.notes,
       player,
     }),
     bucketId: input.bucketId,
@@ -551,6 +554,44 @@ export async function unassignPlayerFromBoard(
   );
   await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
   return true;
+}
+
+export async function updateBoardPlayerNotes(
+  boardId: string,
+  playerId: string,
+  notes: string | null,
+  db: PrismaClient = prisma,
+) {
+  const assignment = await db.boardPlayer.findUnique({
+    where: { boardId_playerId: { boardId, playerId } },
+    include: {
+      player: {
+        select: {
+          id: true,
+          nbaPersonId: true,
+          fullName: true,
+          teamAbbr: true,
+          teamName: true,
+          position: true,
+          jerseyNumber: true,
+          isActive: true,
+        },
+      },
+    },
+  });
+  if (!assignment) {
+    return null;
+  }
+
+  const updated = await db.boardPlayer.update({
+    where: { id: assignment.id },
+    data: { notes },
+  });
+  await db.board.update({ where: { id: boardId }, data: { updatedAt: new Date() } });
+  return serializeAssignment({
+    ...assignment,
+    notes: updated.notes,
+  });
 }
 
 export async function clearBoardPlayers(boardId: string, db: PrismaClient = prisma) {

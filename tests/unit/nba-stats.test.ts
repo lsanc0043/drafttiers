@@ -271,6 +271,9 @@ describe("GET player detail", () => {
         if (sql.includes("PlayerSeasonStats")) {
           return [{ ...seasonRow, playerId: "player-1" }];
         }
+        if (sql.includes("AS games") || sql.includes("COUNT(*)")) {
+          return [{ teamId: 1610612747, season: "2025-26", games: 65 }];
+        }
         if (sql.includes("TeamGame")) {
           return [
             {

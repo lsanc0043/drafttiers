@@ -4,7 +4,7 @@ import { useState } from "react";
 import { nbaHeadshotUrl, playerInitials } from "@/lib/nba/headshot";
 
 type PlayerPhotoProps = {
-  nbaPersonId: number;
+  nbaPersonId: number | null;
   fullName: string;
   size: "card" | "modal" | "compact";
   photoSize?: number;
@@ -27,7 +27,7 @@ export function PlayerPhoto({ nbaPersonId, fullName, size, photoSize }: PlayerPh
         ? { width: 64, height: 64 }
         : undefined;
 
-  if (failed) {
+  if (nbaPersonId == null || failed) {
     return (
       <div
         className={`flex items-center justify-center rounded-full bg-zinc-200 font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 ${frameClass}`}
@@ -42,7 +42,7 @@ export function PlayerPhoto({ nbaPersonId, fullName, size, photoSize }: PlayerPh
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={nbaHeadshotUrl(nbaPersonId, isModal ? "large" : "small")}
+      src={nbaHeadshotUrl(nbaPersonId, isModal || (photoSize != null && photoSize >= 96) ? "large" : "small")}
       alt=""
       draggable={false}
       className={`rounded-full object-cover object-top ${frameClass}`}

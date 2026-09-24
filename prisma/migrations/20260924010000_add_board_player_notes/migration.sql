@@ -1,0 +1,1 @@
+ALTER TABLE "BoardPlayer" ADD COLUMN IF NOT EXISTS "notes" TEXT;

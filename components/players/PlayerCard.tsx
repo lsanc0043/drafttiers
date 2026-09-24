@@ -21,7 +21,7 @@ export type PlayerCardData = {
   avgTurnovers?: number | null;
   avgUsageRate?: number | null;
   isInjured?: boolean;
-  injuryLabel?: "GTD" | "OUT" | null;
+  injuryLabel?: "GTD" | "DTD" | "OUT" | null;
   injuryUrl?: string | null;
 };
 
@@ -32,10 +32,15 @@ export function InjuryBadge({
 }: {
   className?: string;
   href?: string | null;
-  label?: "GTD" | "OUT" | null;
+  label?: "GTD" | "DTD" | "OUT" | null;
 }) {
   const text = label ?? "GTD";
-  const colorClass = text === "OUT" ? "bg-red-600 hover:bg-red-500" : "bg-amber-500 hover:bg-amber-400";
+  const colorClass =
+    text === "OUT"
+      ? "bg-red-600 hover:bg-red-500"
+      : text === "DTD"
+        ? "bg-orange-500 hover:bg-orange-400"
+        : "bg-amber-500 hover:bg-amber-400";
   const badgeClass = `absolute left-2 top-2 z-10 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white ${colorClass} ${className}`;
 
   if (href) {

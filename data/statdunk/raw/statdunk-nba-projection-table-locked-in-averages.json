@@ -1,0 +1,4433 @@
+{
+  "surface": "locked-in",
+  "access": {
+    "level": "preview",
+    "previewLimit": 40,
+    "totalPlayerCount": 250
+  },
+  "release": {
+    "publication": {
+      "id": "d9246a2d-a9aa-439e-a422-3f82b93a994f",
+      "sourcePointsPublicationId": "c88e25bf-18cd-45f3-98dd-6f78a04daace",
+      "sourcePointsContentSha256": "5d78ed14312c9d54062f25f8445f5898d126d960b485e1e1532f84c19eee4fb5",
+      "contentSha256": "d3880da3221d139aeda0075ed7bb92dfe528cb16812aa349acf56a68db69ac08",
+      "targetSeason": "2026-27",
+      "modelVersion": "statmaxers-nba-preseason-lock-in-v4.30",
+      "label": "Projections V4.30 Lock-In",
+      "asOf": "2026-09-21T20:49:00Z",
+      "draws": 20000,
+      "candidateVerifiedAt": "2026-09-22T17:49:30.531671+00:00",
+      "publishedAt": "2026-09-22T17:50:35.099624+00:00",
+      "activatedAt": "2026-09-22T17:50:35.099624+00:00",
+      "workflowRunUrl": "https://github.com/danvn/react-sleeper/actions/runs/35761885405",
+      "schedule": {
+        "model": "historical-week-template-blend-v1",
+        "status": "provisional-fallback",
+        "templateLibraryAsOf": "2026-08-11T02:51:07Z",
+        "pendingRegularSeasonSlots": 6,
+        "assignedRegularSeasonGames": 1200,
+        "templateLibraryContentSha256": "7ec5d1ff2cfb8509f037b25ea32fa6f9a22372a988cd22ea167f471cf3814027",
+        "missingAssignedRegularSeasonGames": 30
+      },
+      "profileLibrary": {
+        "asOf": "2026-08-11T02:51:07Z",
+        "contentSha256": "5a2c5a8ac0340a089080ddccd5ad57ef4b91c96733a612b62cbb8b3b872a5742",
+        "playerProfileCount": 250,
+        "profileFallbackPlayerCount": 36
+      }
+    },
+    "players": [
+      {
+        "canonicalPlayerId": "3a687603-450d-472f-9c1a-8e435af26581",
+        "sleeperPlayerId": "1658",
+        "displayName": "Nikola Jokić",
+        "teamAbbreviation": "DEN",
+        "fantasyPositions": [
+          "C"
+        ],
+        "teamIdAtCutoff": "1610612743",
+        "projectedGames": 65.464848,
+        "projectedMinutes": 2341.14944,
+        "projectedStats": {
+          "dd": 56.187587,
+          "pf": 168.570184,
+          "qd": 0,
+          "td": 33.444992,
+          "to": 225.212417,
+          "ast": 688.966835,
+          "blk": 53.511987,
+          "fga": 1127.065405,
+          "fgm": 639.171168,
+          "fta": 422.894179,
+          "ftm": 346.129964,
+          "min": 2341.14944,
+          "pts": 1732.884429,
+          "reb": 842.813798,
+          "stl": 96.990477,
+          "tpa": 280.490617,
+          "tpm": 108.412128,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 4288.141763,
+        "projectedFptsPerGame": 65.502968,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 1,
+          "averages": 1
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 1,
+          "averageRank": 1,
+          "projectedGames": 65.465,
+          "profileFallback": false,
+          "p10LockedInTotal": 1462.525,
+          "p50LockedInTotal": 1678.679,
+          "p90LockedInTotal": 1831.606,
+          "canonicalPlayerId": "3a687603-450d-472f-9c1a-8e435af26581",
+          "projectedTotalFpts": 4288.142,
+          "regularPerGameRank": 1,
+          "expectedActiveWeeks": 22.647,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1658.2
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1657.846
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1663.42
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1662.4
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1665.596
+            }
+          ],
+          "expectedLockedInTotal": 1659.449,
+          "expectedSelectedStats": {
+            "dd": 21.744,
+            "pf": 65.234,
+            "qd": 0,
+            "td": 12.943,
+            "to": 87.154,
+            "ast": 266.62,
+            "blk": 20.708,
+            "fga": 436.158,
+            "fgm": 247.35,
+            "fta": 163.654,
+            "ftm": 133.947,
+            "min": 905.991,
+            "pts": 670.601,
+            "reb": 326.157,
+            "stl": 37.534,
+            "tpa": 108.546,
+            "tpm": 41.954,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 7.75,
+          "scheduleScenarioStdDev": 2.436,
+          "monteCarloStandardError": 1.026,
+          "expectedFptsPerActiveWeek": 73.275
+        }
+      },
+      {
+        "canonicalPlayerId": "49594405-7cf9-40e9-9f7e-746bdb5cb8a5",
+        "sleeperPlayerId": "1970",
+        "displayName": "Luka Dončić",
+        "teamAbbreviation": "LAL",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612747",
+        "projectedGames": 60.951982,
+        "projectedMinutes": 2196.601114,
+        "projectedStats": {
+          "dd": 32.344539,
+          "pf": 151.023123,
+          "qd": 0,
+          "td": 8.609497,
+          "to": 205.619681,
+          "ast": 531.980249,
+          "blk": 32.458765,
+          "fga": 1245.944318,
+          "fgm": 589.406282,
+          "fta": 519.675517,
+          "ftm": 406.60512,
+          "min": 2196.601114,
+          "pts": 1801.887431,
+          "reb": 501.342719,
+          "stl": 102.810969,
+          "tpa": 585.106078,
+          "tpm": 216.469747,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3533.297818,
+        "projectedFptsPerGame": 57.968548,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 5,
+          "averages": 2
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 4,
+          "averageRank": 2,
+          "projectedGames": 60.952,
+          "profileFallback": false,
+          "p10LockedInTotal": 1227.669,
+          "p50LockedInTotal": 1447.049,
+          "p90LockedInTotal": 1611.449,
+          "canonicalPlayerId": "49594405-7cf9-40e9-9f7e-746bdb5cb8a5",
+          "projectedTotalFpts": 3533.298,
+          "regularPerGameRank": 2,
+          "expectedActiveWeeks": 21.852,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1431.257
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1428.24
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1434.593
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1432.888
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1428.083
+            }
+          ],
+          "expectedLockedInTotal": 1430.883,
+          "expectedSelectedStats": {
+            "dd": 13.099,
+            "pf": 61.16,
+            "qd": 0,
+            "td": 3.487,
+            "to": 83.27,
+            "ast": 215.437,
+            "blk": 13.145,
+            "fga": 504.571,
+            "fgm": 238.692,
+            "fta": 210.454,
+            "ftm": 164.663,
+            "min": 889.56,
+            "pts": 729.712,
+            "reb": 203.029,
+            "stl": 41.635,
+            "tpa": 236.951,
+            "tpm": 87.664,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 6.51,
+          "scheduleScenarioStdDev": 2.057,
+          "monteCarloStandardError": 1.061,
+          "expectedFptsPerActiveWeek": 65.48
+        }
+      },
+      {
+        "canonicalPlayerId": "6ccb2972-c08f-4fd0-9111-dcad2620b6a3",
+        "sleeperPlayerId": "1380",
+        "displayName": "Giannis Antetokounmpo",
+        "teamAbbreviation": "MIA",
+        "fantasyPositions": [
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612748",
+        "projectedGames": 65,
+        "projectedMinutes": 2202.537528,
+        "projectedStats": {
+          "dd": 51.064849,
+          "pf": 168.853606,
+          "qd": 0,
+          "td": 6.528098,
+          "to": 216.233575,
+          "ast": 430.24781,
+          "blk": 62.694313,
+          "fga": 1234.836294,
+          "fgm": 744.932791,
+          "fta": 683.06502,
+          "ftm": 435.05165,
+          "min": 2202.537528,
+          "pts": 1954.201622,
+          "reb": 726.314347,
+          "stl": 65.391438,
+          "tpa": 98.25847,
+          "tpm": 29.28439,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3657.187751,
+        "projectedFptsPerGame": 56.264426,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 4,
+          "averages": 3
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 3,
+          "averageRank": 3,
+          "projectedGames": 65,
+          "profileFallback": false,
+          "p10LockedInTotal": 1268.68,
+          "p50LockedInTotal": 1460.968,
+          "p90LockedInTotal": 1601.522,
+          "canonicalPlayerId": "6ccb2972-c08f-4fd0-9111-dcad2620b6a3",
+          "projectedTotalFpts": 3657.188,
+          "regularPerGameRank": 3,
+          "expectedActiveWeeks": 22.582,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1445.687
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1444.436
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1444.157
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1443.833
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1454.655
+            }
+          ],
+          "expectedLockedInTotal": 1445.492,
+          "expectedSelectedStats": {
+            "dd": 20.183,
+            "pf": 66.739,
+            "qd": 0,
+            "td": 2.58,
+            "to": 85.466,
+            "ast": 170.054,
+            "blk": 24.78,
+            "fga": 488.065,
+            "fgm": 294.432,
+            "fta": 269.979,
+            "ftm": 171.953,
+            "min": 870.546,
+            "pts": 772.392,
+            "reb": 287.074,
+            "stl": 25.846,
+            "tpa": 38.836,
+            "tpm": 11.575,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 10.822,
+          "scheduleScenarioStdDev": 2.219,
+          "monteCarloStandardError": 0.925,
+          "expectedFptsPerActiveWeek": 64.01
+        }
+      },
+      {
+        "canonicalPlayerId": "1b1668aa-83bf-4df3-a37f-06d775cbf260",
+        "sleeperPlayerId": "1957",
+        "displayName": "Shai Gilgeous-Alexander",
+        "teamAbbreviation": "OKC",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612760",
+        "projectedGames": 67.555758,
+        "projectedMinutes": 2340.964212,
+        "projectedStats": {
+          "dd": 7.22764,
+          "pf": 149.496505,
+          "qd": 0,
+          "td": 0.005075,
+          "to": 144.456572,
+          "ast": 443.716735,
+          "blk": 59.253443,
+          "fga": 1273.336361,
+          "fgm": 685.051061,
+          "fta": 555.427566,
+          "ftm": 490.639731,
+          "min": 2340.964212,
+          "pts": 1975.488782,
+          "reb": 327.720531,
+          "stl": 107.854915,
+          "tpa": 303.456748,
+          "tpm": 114.746928,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3716.887925,
+        "projectedFptsPerGame": 55.019557,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 2,
+          "averages": 4
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 2,
+          "averageRank": 4,
+          "projectedGames": 67.556,
+          "profileFallback": false,
+          "p10LockedInTotal": 1289.173,
+          "p50LockedInTotal": 1467.522,
+          "p90LockedInTotal": 1591.923,
+          "canonicalPlayerId": "1b1668aa-83bf-4df3-a37f-06d775cbf260",
+          "projectedTotalFpts": 3716.888,
+          "regularPerGameRank": 4,
+          "expectedActiveWeeks": 23.023,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1453.697
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1448.71
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1447.279
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1450.126
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1450.708
+            }
+          ],
+          "expectedLockedInTotal": 1451.23,
+          "expectedSelectedStats": {
+            "dd": 2.822,
+            "pf": 58.37,
+            "qd": 0,
+            "td": 0.002,
+            "to": 56.402,
+            "ast": 173.246,
+            "blk": 23.135,
+            "fga": 497.164,
+            "fgm": 267.473,
+            "fta": 216.862,
+            "ftm": 191.567,
+            "min": 914.012,
+            "pts": 771.314,
+            "reb": 127.956,
+            "stl": 42.111,
+            "tpa": 118.482,
+            "tpm": 44.802,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 6.418,
+          "scheduleScenarioStdDev": 2.586,
+          "monteCarloStandardError": 0.853,
+          "expectedFptsPerActiveWeek": 63.034
+        }
+      },
+      {
+        "canonicalPlayerId": "3db2574b-e2b4-4ada-b46c-236b24626e00",
+        "sleeperPlayerId": "2577",
+        "displayName": "Victor Wembanyama",
+        "teamAbbreviation": "SAS",
+        "fantasyPositions": [
+          "C"
+        ],
+        "teamIdAtCutoff": "1610612759",
+        "projectedGames": 65,
+        "projectedMinutes": 2012.252095,
+        "projectedStats": {
+          "dd": 40.883852,
+          "pf": 149.498449,
+          "qd": 0,
+          "td": 1.022096,
+          "to": 149.764288,
+          "ast": 210.807362,
+          "blk": 207.613311,
+          "fga": 1030.378299,
+          "fgm": 521.179721,
+          "fta": 401.368291,
+          "ftm": 335.472004,
+          "min": 2012.252095,
+          "pts": 1497.642877,
+          "reb": 734.631717,
+          "stl": 70.269121,
+          "tpa": 341.462576,
+          "tpm": 119.81143,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3531.786756,
+        "projectedFptsPerGame": 54.33518,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 6,
+          "averages": 5
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 6,
+          "averageRank": 5,
+          "projectedGames": 65,
+          "profileFallback": false,
+          "p10LockedInTotal": 1231.462,
+          "p50LockedInTotal": 1420.08,
+          "p90LockedInTotal": 1555.649,
+          "canonicalPlayerId": "3db2574b-e2b4-4ada-b46c-236b24626e00",
+          "projectedTotalFpts": 3531.787,
+          "regularPerGameRank": 5,
+          "expectedActiveWeeks": 22.582,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1405.564
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1405.405
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1402.338
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1393.367
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1397.954
+            }
+          ],
+          "expectedLockedInTotal": 1403.825,
+          "expectedSelectedStats": {
+            "dd": 16.251,
+            "pf": 59.423,
+            "qd": 0,
+            "td": 0.406,
+            "to": 59.529,
+            "ast": 83.792,
+            "blk": 82.523,
+            "fga": 409.558,
+            "fgm": 207.16,
+            "fta": 159.537,
+            "ftm": 133.344,
+            "min": 799.836,
+            "pts": 595.288,
+            "reb": 292.004,
+            "stl": 27.931,
+            "tpa": 135.726,
+            "tpm": 47.623,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 12.196,
+          "scheduleScenarioStdDev": 3.512,
+          "monteCarloStandardError": 0.909,
+          "expectedFptsPerActiveWeek": 62.165
+        }
+      },
+      {
+        "canonicalPlayerId": "5b427931-c392-4235-88fb-e85d95b0ce1c",
+        "sleeperPlayerId": "1822",
+        "displayName": "Jayson Tatum",
+        "teamAbbreviation": "BOS",
+        "fantasyPositions": [
+          "PF",
+          "SF"
+        ],
+        "teamIdAtCutoff": "1610612738",
+        "projectedGames": 68,
+        "projectedMinutes": 2460.364341,
+        "projectedStats": {
+          "dd": 34.146834,
+          "pf": 149.647373,
+          "qd": 0,
+          "td": 2.341423,
+          "to": 197.0872,
+          "ast": 429.509318,
+          "blk": 33.975312,
+          "fga": 1502.967137,
+          "fgm": 707.883343,
+          "fta": 471.561469,
+          "ftm": 386.237103,
+          "min": 2460.364341,
+          "pts": 2035.95622,
+          "reb": 635.757161,
+          "stl": 84.355349,
+          "tpa": 694.767828,
+          "tpm": 233.952432,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3671.307876,
+        "projectedFptsPerGame": 53.989824,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 3,
+          "averages": 6
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 5,
+          "averageRank": 6,
+          "projectedGames": 68,
+          "profileFallback": false,
+          "p10LockedInTotal": 1268.04,
+          "p50LockedInTotal": 1444.459,
+          "p90LockedInTotal": 1564.665,
+          "canonicalPlayerId": "5b427931-c392-4235-88fb-e85d95b0ce1c",
+          "projectedTotalFpts": 3671.308,
+          "regularPerGameRank": 6,
+          "expectedActiveWeeks": 23.06,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1424.06
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1431.716
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1431.573
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1434.853
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1430.696
+            }
+          ],
+          "expectedLockedInTotal": 1428.055,
+          "expectedSelectedStats": {
+            "dd": 13.282,
+            "pf": 58.209,
+            "qd": 0,
+            "td": 0.911,
+            "to": 76.662,
+            "ast": 167.069,
+            "blk": 13.216,
+            "fga": 584.62,
+            "fgm": 275.35,
+            "fta": 183.427,
+            "ftm": 150.237,
+            "min": 957.025,
+            "pts": 791.94,
+            "reb": 247.295,
+            "stl": 32.812,
+            "tpa": 270.249,
+            "tpm": 91.002,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 10.792,
+          "scheduleScenarioStdDev": 4.086,
+          "monteCarloStandardError": 0.834,
+          "expectedFptsPerActiveWeek": 61.927
+        }
+      },
+      {
+        "canonicalPlayerId": "d8880fca-a157-4c45-86bf-76fe9e4dd5ff",
+        "sleeperPlayerId": "2267",
+        "displayName": "Cade Cunningham",
+        "teamAbbreviation": "DET",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612765",
+        "projectedGames": 65.094817,
+        "projectedMinutes": 2133.944693,
+        "projectedStats": {
+          "dd": 32.992529,
+          "pf": 186.572615,
+          "qd": 0,
+          "td": 4.431193,
+          "to": 227.151374,
+          "ast": 600.782162,
+          "blk": 50.618316,
+          "fga": 1255.010388,
+          "fgm": 595.924586,
+          "fta": 376.906799,
+          "ftm": 315.44906,
+          "min": 2133.944693,
+          "pts": 1643.501078,
+          "reb": 369.121363,
+          "stl": 84.385299,
+          "tpa": 381.468953,
+          "tpm": 136.202846,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3311.482368,
+        "projectedFptsPerGame": 50.871671,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 7,
+          "averages": 7
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 7,
+          "averageRank": 7,
+          "projectedGames": 65.095,
+          "profileFallback": false,
+          "p10LockedInTotal": 1162.363,
+          "p50LockedInTotal": 1337.813,
+          "p90LockedInTotal": 1468.686,
+          "canonicalPlayerId": "d8880fca-a157-4c45-86bf-76fe9e4dd5ff",
+          "projectedTotalFpts": 3311.482,
+          "regularPerGameRank": 7,
+          "expectedActiveWeeks": 22.6,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1324.082
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1324.913
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1325.985
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1319.02
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1328.135
+            }
+          ],
+          "expectedLockedInTotal": 1324.35,
+          "expectedSelectedStats": {
+            "dd": 13.195,
+            "pf": 74.615,
+            "qd": 0,
+            "td": 1.772,
+            "to": 90.844,
+            "ast": 240.269,
+            "blk": 20.244,
+            "fga": 501.912,
+            "fgm": 238.326,
+            "fta": 150.735,
+            "ftm": 126.157,
+            "min": 853.422,
+            "pts": 657.28,
+            "reb": 147.622,
+            "stl": 33.748,
+            "tpa": 152.56,
+            "tpm": 54.471,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 9.115,
+          "scheduleScenarioStdDev": 1.816,
+          "monteCarloStandardError": 0.854,
+          "expectedFptsPerActiveWeek": 58.601
+        }
+      },
+      {
+        "canonicalPlayerId": "69e9cbed-d379-4d95-8b13-a8377b7f8146",
+        "sleeperPlayerId": "2284",
+        "displayName": "Jalen Johnson",
+        "teamAbbreviation": "ATL",
+        "fantasyPositions": [
+          "PF",
+          "SF"
+        ],
+        "teamIdAtCutoff": "1610612737",
+        "projectedGames": 65,
+        "projectedMinutes": 2178.96309,
+        "projectedStats": {
+          "dd": 40.122297,
+          "pf": 135.598062,
+          "qd": 0,
+          "td": 8.807898,
+          "to": 187.471064,
+          "ast": 465.849916,
+          "blk": 38.284594,
+          "fga": 988.680718,
+          "fgm": 493.574317,
+          "fta": 288.613922,
+          "ftm": 226.492618,
+          "min": 2178.96309,
+          "pts": 1311.255124,
+          "reb": 646.832406,
+          "stl": 85.15176,
+          "tpa": 275.833836,
+          "tpm": 97.613872,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3042.551134,
+        "projectedFptsPerGame": 46.808481,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 14,
+          "averages": 8
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 11,
+          "averageRank": 8,
+          "projectedGames": 65,
+          "profileFallback": false,
+          "p10LockedInTotal": 1077.854,
+          "p50LockedInTotal": 1247.112,
+          "p90LockedInTotal": 1370.78,
+          "canonicalPlayerId": "69e9cbed-d379-4d95-8b13-a8377b7f8146",
+          "projectedTotalFpts": 3042.551,
+          "regularPerGameRank": 8,
+          "expectedActiveWeeks": 22.592,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1234.111
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1232.172
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1234.608
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1237.645
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1234.728
+            }
+          ],
+          "expectedLockedInTotal": 1233.984,
+          "expectedSelectedStats": {
+            "dd": 16.273,
+            "pf": 54.995,
+            "qd": 0,
+            "td": 3.572,
+            "to": 76.034,
+            "ast": 188.937,
+            "blk": 15.527,
+            "fga": 400.985,
+            "fgm": 200.182,
+            "fta": 117.055,
+            "ftm": 91.86,
+            "min": 883.734,
+            "pts": 531.813,
+            "reb": 262.339,
+            "stl": 34.535,
+            "tpa": 111.871,
+            "tpm": 39.59,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 5.473,
+          "scheduleScenarioStdDev": 1.382,
+          "monteCarloStandardError": 0.817,
+          "expectedFptsPerActiveWeek": 54.62
+        }
+      },
+      {
+        "canonicalPlayerId": "2cbc4059-6985-49cc-a4bc-695e1244a8d4",
+        "sleeperPlayerId": "2133",
+        "displayName": "Anthony Edwards",
+        "teamAbbreviation": "MIN",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612750",
+        "projectedGames": 66.025455,
+        "projectedMinutes": 2367.233742,
+        "projectedStats": {
+          "dd": 4.259882,
+          "pf": 130.287866,
+          "qd": 0,
+          "td": 0.005219,
+          "to": 175.421036,
+          "ast": 290.634435,
+          "blk": 48.461665,
+          "fga": 1277.428126,
+          "fgm": 611.122498,
+          "fta": 432.819676,
+          "ftm": 357.89325,
+          "min": 2367.233742,
+          "pts": 1806.511705,
+          "reb": 368.1731,
+          "stl": 91.704382,
+          "tpa": 564.584726,
+          "tpm": 226.373459,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3062.039694,
+        "projectedFptsPerGame": 46.376656,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 12,
+          "averages": 9
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 10,
+          "averageRank": 9,
+          "projectedGames": 66.025,
+          "profileFallback": false,
+          "p10LockedInTotal": 1085.56,
+          "p50LockedInTotal": 1247.828,
+          "p90LockedInTotal": 1368.256,
+          "canonicalPlayerId": "2cbc4059-6985-49cc-a4bc-695e1244a8d4",
+          "projectedTotalFpts": 3062.04,
+          "regularPerGameRank": 9,
+          "expectedActiveWeeks": 22.759,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1237.139
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1233.413
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1232.751
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1235.227
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1228.969
+            }
+          ],
+          "expectedLockedInTotal": 1235.107,
+          "expectedSelectedStats": {
+            "dd": 1.718,
+            "pf": 52.553,
+            "qd": 0,
+            "td": 0.002,
+            "to": 70.758,
+            "ast": 117.231,
+            "blk": 19.548,
+            "fga": 515.264,
+            "fgm": 246.503,
+            "fta": 174.583,
+            "ftm": 144.36,
+            "min": 954.849,
+            "pts": 728.676,
+            "reb": 148.507,
+            "stl": 36.99,
+            "tpa": 227.731,
+            "tpm": 91.31,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.17,
+          "scheduleScenarioStdDev": 2.315,
+          "monteCarloStandardError": 0.788,
+          "expectedFptsPerActiveWeek": 54.27
+        }
+      },
+      {
+        "canonicalPlayerId": "d9e2b65a-3b3f-444e-8aaa-49acd9f55cba",
+        "sleeperPlayerId": "2126",
+        "displayName": "Tyrese Maxey",
+        "teamAbbreviation": "PHI",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612755",
+        "projectedGames": 69.5,
+        "projectedMinutes": 2553.186814,
+        "projectedStats": {
+          "dd": 8.083744,
+          "pf": 145.197536,
+          "qd": 0,
+          "td": 0.326382,
+          "to": 143.476322,
+          "ast": 439.715507,
+          "blk": 28.368742,
+          "fga": 1305.765027,
+          "fgm": 608.164497,
+          "fta": 364.898684,
+          "ftm": 325.546887,
+          "min": 2553.186814,
+          "pts": 1742.212416,
+          "reb": 283.687424,
+          "stl": 99.290598,
+          "tpa": 540.193204,
+          "tpm": 200.336535,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3200.564275,
+        "projectedFptsPerGame": 46.051283,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 8,
+          "averages": 11
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 8,
+          "averageRank": 10,
+          "projectedGames": 69.5,
+          "profileFallback": false,
+          "p10LockedInTotal": 1130.138,
+          "p50LockedInTotal": 1275.345,
+          "p90LockedInTotal": 1379.122,
+          "canonicalPlayerId": "d9e2b65a-3b3f-444e-8aaa-49acd9f55cba",
+          "projectedTotalFpts": 3200.564,
+          "regularPerGameRank": 11,
+          "expectedActiveWeeks": 23.315,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1261.944
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1259.268
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1263.438
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1268.617
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1266.317
+            }
+          ],
+          "expectedLockedInTotal": 1262.181,
+          "expectedSelectedStats": {
+            "dd": 3.188,
+            "pf": 57.26,
+            "qd": 0,
+            "td": 0.129,
+            "to": 56.582,
+            "ast": 173.407,
+            "blk": 11.188,
+            "fga": 514.944,
+            "fgm": 239.837,
+            "fta": 143.902,
+            "ftm": 128.383,
+            "min": 1006.88,
+            "pts": 687.062,
+            "reb": 111.876,
+            "stl": 39.156,
+            "tpa": 213.032,
+            "tpm": 79.005,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 9.349,
+          "scheduleScenarioStdDev": 2.512,
+          "monteCarloStandardError": 0.705,
+          "expectedFptsPerActiveWeek": 54.136
+        }
+      },
+      {
+        "canonicalPlayerId": "5afe4e2f-b994-40a1-ad98-8059e2fbf22f",
+        "sleeperPlayerId": "1308",
+        "displayName": "Kawhi Leonard",
+        "teamAbbreviation": "TOR",
+        "fantasyPositions": [
+          "SF",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612761",
+        "projectedGames": 65,
+        "projectedMinutes": 2195.997259,
+        "projectedStats": {
+          "dd": 6.078619,
+          "pf": 88.612462,
+          "qd": 0,
+          "td": 0.130608,
+          "to": 128.534759,
+          "ast": 254.563088,
+          "blk": 38.385846,
+          "fga": 1214.528797,
+          "fgm": 597.23517,
+          "fta": 342.521309,
+          "ftm": 295.851354,
+          "min": 2195.997259,
+          "pts": 1639.885828,
+          "reb": 428.620864,
+          "stl": 109.871663,
+          "tpa": 396.264154,
+          "tpm": 149.564133,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2996.429107,
+        "projectedFptsPerGame": 46.098905,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 16,
+          "averages": 10
+        },
+        "lockIn": {
+          "liDelta": -1,
+          "totalRank": 16,
+          "averageRank": 11,
+          "projectedGames": 65,
+          "profileFallback": false,
+          "p10LockedInTotal": 1061.318,
+          "p50LockedInTotal": 1229.238,
+          "p90LockedInTotal": 1350.925,
+          "canonicalPlayerId": "5afe4e2f-b994-40a1-ad98-8059e2fbf22f",
+          "projectedTotalFpts": 2996.429,
+          "regularPerGameRank": 10,
+          "expectedActiveWeeks": 22.581,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1212.932
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1216.692
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1218.654
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1220.128
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1217.27
+            }
+          ],
+          "expectedLockedInTotal": 1215.344,
+          "expectedSelectedStats": {
+            "dd": 2.465,
+            "pf": 35.941,
+            "qd": 0,
+            "td": 0.053,
+            "to": 52.133,
+            "ast": 103.25,
+            "blk": 15.569,
+            "fga": 492.61,
+            "fgm": 242.237,
+            "fta": 138.926,
+            "ftm": 119.997,
+            "min": 890.691,
+            "pts": 665.133,
+            "reb": 173.847,
+            "stl": 44.564,
+            "tpa": 160.724,
+            "tpm": 60.663,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 7.196,
+          "scheduleScenarioStdDev": 2.576,
+          "monteCarloStandardError": 0.811,
+          "expectedFptsPerActiveWeek": 53.822
+        }
+      },
+      {
+        "canonicalPlayerId": "bfdf433f-94de-438c-a22e-4abf2517c53f",
+        "sleeperPlayerId": "4760",
+        "displayName": "Cooper Flagg",
+        "teamAbbreviation": "DAL",
+        "fantasyPositions": [
+          "PG",
+          "SF",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612742",
+        "projectedGames": 66.98,
+        "projectedMinutes": 2287.128001,
+        "projectedStats": {
+          "dd": 13.758642,
+          "pf": 140.244266,
+          "qd": 0,
+          "td": 0.009205,
+          "to": 161.828369,
+          "ast": 346.28431,
+          "blk": 64.8437,
+          "fga": 1212.652465,
+          "fgm": 592.310385,
+          "fta": 366.201296,
+          "ftm": 308.017305,
+          "min": 2287.128001,
+          "pts": 1584.950489,
+          "reb": 481.657379,
+          "stl": 88.533987,
+          "tpa": 270.840517,
+          "tpm": 92.312415,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3055.127227,
+        "projectedFptsPerGame": 45.612527,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 13,
+          "averages": 12
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 13,
+          "averageRank": 12,
+          "projectedGames": 66.98,
+          "profileFallback": false,
+          "p10LockedInTotal": 1078.707,
+          "p50LockedInTotal": 1240.152,
+          "p90LockedInTotal": 1351.486,
+          "canonicalPlayerId": "bfdf433f-94de-438c-a22e-4abf2517c53f",
+          "projectedTotalFpts": 3055.127,
+          "regularPerGameRank": 12,
+          "expectedActiveWeeks": 22.906,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1225.224
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1227.608
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1222.802
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1226.461
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1231.064
+            }
+          ],
+          "expectedLockedInTotal": 1225.902,
+          "expectedSelectedStats": {
+            "dd": 5.521,
+            "pf": 56.274,
+            "qd": 0,
+            "td": 0.004,
+            "to": 64.935,
+            "ast": 138.95,
+            "blk": 26.019,
+            "fga": 486.59,
+            "fgm": 237.671,
+            "fta": 146.942,
+            "ftm": 123.595,
+            "min": 917.734,
+            "pts": 635.978,
+            "reb": 193.27,
+            "stl": 35.525,
+            "tpa": 108.678,
+            "tpm": 37.041,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.262,
+          "scheduleScenarioStdDev": 1.875,
+          "monteCarloStandardError": 0.766,
+          "expectedFptsPerActiveWeek": 53.518
+        }
+      },
+      {
+        "canonicalPlayerId": "50cd1f6d-752f-4520-9a44-36d96c2412f8",
+        "sleeperPlayerId": "1747",
+        "displayName": "Jamal Murray",
+        "teamAbbreviation": "DEN",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612743",
+        "projectedGames": 67.904242,
+        "projectedMinutes": 2437.244249,
+        "projectedStats": {
+          "dd": 13.482557,
+          "pf": 131.531387,
+          "qd": 0,
+          "td": 0.005153,
+          "to": 140.760809,
+          "ast": 459.59463,
+          "blk": 31.335997,
+          "fga": 1211.197659,
+          "fgm": 576.137265,
+          "fta": 321.017792,
+          "ftm": 283.048906,
+          "min": 2437.244249,
+          "pts": 1631.733867,
+          "reb": 306.39642,
+          "stl": 69.63555,
+          "tpa": 477.932049,
+          "tpm": 196.410431,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3079.202533,
+        "projectedFptsPerGame": 45.346246,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 10,
+          "averages": 13
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 12,
+          "averageRank": 13,
+          "projectedGames": 67.904,
+          "profileFallback": false,
+          "p10LockedInTotal": 1089.31,
+          "p50LockedInTotal": 1242.064,
+          "p90LockedInTotal": 1351.372,
+          "canonicalPlayerId": "50cd1f6d-752f-4520-9a44-36d96c2412f8",
+          "projectedTotalFpts": 3079.203,
+          "regularPerGameRank": 13,
+          "expectedActiveWeeks": 23.07,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1229.011
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1226.492
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1234.867
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1232.676
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1230.388
+            }
+          ],
+          "expectedLockedInTotal": 1229.457,
+          "expectedSelectedStats": {
+            "dd": 5.383,
+            "pf": 52.518,
+            "qd": 0,
+            "td": 0.002,
+            "to": 56.203,
+            "ast": 183.506,
+            "blk": 12.512,
+            "fga": 483.604,
+            "fgm": 230.039,
+            "fta": 128.175,
+            "ftm": 113.015,
+            "min": 973.137,
+            "pts": 651.515,
+            "reb": 122.337,
+            "stl": 27.804,
+            "tpa": 190.828,
+            "tpm": 78.422,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.375,
+          "scheduleScenarioStdDev": 2.603,
+          "monteCarloStandardError": 0.735,
+          "expectedFptsPerActiveWeek": 53.293
+        }
+      },
+      {
+        "canonicalPlayerId": "71ede9a8-7648-432a-824d-6edae15e7479",
+        "sleeperPlayerId": "1845",
+        "displayName": "Donovan Mitchell",
+        "teamAbbreviation": "CLE",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612739",
+        "projectedGames": 67.17697,
+        "projectedMinutes": 2326.851725,
+        "projectedStats": {
+          "dd": 5.63474,
+          "pf": 159.890183,
+          "qd": 0,
+          "td": 0.005379,
+          "to": 157.606503,
+          "ast": 386.093992,
+          "blk": 20.1721,
+          "fga": 1265.769348,
+          "fgm": 594.050431,
+          "fta": 372.203518,
+          "ftm": 317.419497,
+          "min": 2326.851725,
+          "pts": 1715.326137,
+          "reb": 303.993546,
+          "stl": 101.532903,
+          "tpa": 572.994203,
+          "tpm": 209.805777,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3040.467943,
+        "projectedFptsPerGame": 45.260568,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 15,
+          "averages": 15
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 14,
+          "averageRank": 14,
+          "projectedGames": 67.177,
+          "profileFallback": false,
+          "p10LockedInTotal": 1075.476,
+          "p50LockedInTotal": 1233.534,
+          "p90LockedInTotal": 1344.153,
+          "canonicalPlayerId": "71ede9a8-7648-432a-824d-6edae15e7479",
+          "projectedTotalFpts": 3040.468,
+          "regularPerGameRank": 15,
+          "expectedActiveWeeks": 22.937,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1222.06
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1220.234
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1215.447
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1220.721
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1213.768
+            }
+          ],
+          "expectedLockedInTotal": 1220.262,
+          "expectedSelectedStats": {
+            "dd": 2.261,
+            "pf": 64.17,
+            "qd": 0,
+            "td": 0.002,
+            "to": 63.254,
+            "ast": 154.955,
+            "blk": 8.096,
+            "fga": 508.004,
+            "fgm": 238.416,
+            "fta": 149.38,
+            "ftm": 127.393,
+            "min": 933.859,
+            "pts": 688.429,
+            "reb": 122.005,
+            "stl": 40.749,
+            "tpa": 229.966,
+            "tpm": 84.203,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.292,
+          "scheduleScenarioStdDev": 2.577,
+          "monteCarloStandardError": 0.752,
+          "expectedFptsPerActiveWeek": 53.201
+        }
+      },
+      {
+        "canonicalPlayerId": "ac2deec3-c726-4577-ac77-8b97bd7e75a6",
+        "sleeperPlayerId": "1433",
+        "displayName": "Kevin Durant",
+        "teamAbbreviation": "HOU",
+        "fantasyPositions": [
+          "PF",
+          "SF"
+        ],
+        "teamIdAtCutoff": "1610612745",
+        "projectedGames": 70,
+        "projectedMinutes": 2468.745826,
+        "projectedStats": {
+          "dd": 6.88371,
+          "pf": 129.921911,
+          "qd": 0,
+          "td": 0.100936,
+          "to": 205.000548,
+          "ast": 321.702269,
+          "blk": 69.98845,
+          "fga": 1271.698288,
+          "fgm": 663.64581,
+          "fta": 409.735645,
+          "ftm": 350.728576,
+          "min": 2468.745826,
+          "pts": 1848.893816,
+          "reb": 398.194383,
+          "stl": 56.309059,
+          "tpa": 423.345358,
+          "tpm": 170.87362,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3153.14156,
+        "projectedFptsPerGame": 45.04488,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 9,
+          "averages": 16
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 9,
+          "averageRank": 15,
+          "projectedGames": 70,
+          "profileFallback": false,
+          "p10LockedInTotal": 1118.001,
+          "p50LockedInTotal": 1255.199,
+          "p90LockedInTotal": 1356.758,
+          "canonicalPlayerId": "ac2deec3-c726-4577-ac77-8b97bd7e75a6",
+          "projectedTotalFpts": 3153.142,
+          "regularPerGameRank": 16,
+          "expectedActiveWeeks": 23.407,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1240.818
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1246.581
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1245.338
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1251.52
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1254.072
+            }
+          ],
+          "expectedLockedInTotal": 1244.289,
+          "expectedSelectedStats": {
+            "dd": 2.716,
+            "pf": 51.27,
+            "qd": 0,
+            "td": 0.04,
+            "to": 80.897,
+            "ast": 126.95,
+            "blk": 27.619,
+            "fga": 501.836,
+            "fgm": 261.887,
+            "fta": 161.689,
+            "ftm": 138.404,
+            "min": 974.214,
+            "pts": 729.608,
+            "reb": 157.135,
+            "stl": 22.221,
+            "tpa": 167.06,
+            "tpm": 67.43,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 13.254,
+          "scheduleScenarioStdDev": 4.023,
+          "monteCarloStandardError": 0.681,
+          "expectedFptsPerActiveWeek": 53.159
+        }
+      },
+      {
+        "canonicalPlayerId": "3f49dc24-6198-49ba-8b29-412d23486a52",
+        "sleeperPlayerId": "2289",
+        "displayName": "Scottie Barnes",
+        "teamAbbreviation": "TOR",
+        "fantasyPositions": [
+          "PF",
+          "SF"
+        ],
+        "teamIdAtCutoff": "1610612761",
+        "projectedGames": 69.025455,
+        "projectedMinutes": 2278.34934,
+        "projectedStats": {
+          "dd": 26.894878,
+          "pf": 163.289159,
+          "qd": 0,
+          "td": 2.367964,
+          "to": 172.874688,
+          "ast": 428.053512,
+          "blk": 89.753156,
+          "fga": 1004.180659,
+          "fgm": 493.63935,
+          "fta": 273.099055,
+          "ftm": 217.667384,
+          "min": 2278.34934,
+          "pts": 1276.613082,
+          "reb": 531.614846,
+          "stl": 96.657245,
+          "tpa": 234.267211,
+          "tpm": 71.666997,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 3063.560547,
+        "projectedFptsPerGame": 44.383055,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 11,
+          "averages": 17
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 15,
+          "averageRank": 16,
+          "projectedGames": 69.025,
+          "profileFallback": false,
+          "p10LockedInTotal": 1085.6,
+          "p50LockedInTotal": 1230.595,
+          "p90LockedInTotal": 1334.528,
+          "canonicalPlayerId": "3f49dc24-6198-49ba-8b29-412d23486a52",
+          "projectedTotalFpts": 3063.561,
+          "regularPerGameRank": 17,
+          "expectedActiveWeeks": 23.241,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1214.797
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1221.812
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1221.715
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1223.171
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1220.393
+            }
+          ],
+          "expectedLockedInTotal": 1218.323,
+          "expectedSelectedStats": {
+            "dd": 10.696,
+            "pf": 64.937,
+            "qd": 0,
+            "td": 0.942,
+            "to": 68.749,
+            "ast": 170.229,
+            "blk": 35.693,
+            "fga": 399.345,
+            "fgm": 196.312,
+            "fta": 108.607,
+            "ftm": 86.562,
+            "min": 906.059,
+            "pts": 507.686,
+            "reb": 211.414,
+            "stl": 38.439,
+            "tpa": 93.164,
+            "tpm": 28.501,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.375,
+          "scheduleScenarioStdDev": 3.56,
+          "monteCarloStandardError": 0.698,
+          "expectedFptsPerActiveWeek": 52.422
+        }
+      },
+      {
+        "canonicalPlayerId": "a3a29b92-0eaf-4e5c-80db-d6bb77f9fb13",
+        "sleeperPlayerId": "1272",
+        "displayName": "Anthony Davis",
+        "teamAbbreviation": "WAS",
+        "fantasyPositions": [
+          "C",
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612764",
+        "projectedGames": 55,
+        "projectedMinutes": 1771.098442,
+        "projectedStats": {
+          "dd": 35.390815,
+          "pf": 114.288733,
+          "qd": 0,
+          "td": 0.713096,
+          "to": 100.763961,
+          "ast": 168.794828,
+          "blk": 108.354639,
+          "fga": 787.218447,
+          "fgm": 409.511036,
+          "fta": 267.654272,
+          "ftm": 207.300858,
+          "min": 1771.098442,
+          "pts": 1058.441442,
+          "reb": 620.323487,
+          "stl": 59.868116,
+          "tpa": 102.338398,
+          "tpm": 32.118513,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2491.286407,
+        "projectedFptsPerGame": 45.296115,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 48,
+          "averages": 14
+        },
+        "lockIn": {
+          "liDelta": -3,
+          "totalRank": 37,
+          "averageRank": 17,
+          "projectedGames": 55,
+          "profileFallback": false,
+          "p10LockedInTotal": 894.51,
+          "p50LockedInTotal": 1087.714,
+          "p90LockedInTotal": 1247.097,
+          "canonicalPlayerId": "a3a29b92-0eaf-4e5c-80db-d6bb77f9fb13",
+          "projectedTotalFpts": 2491.286,
+          "regularPerGameRank": 14,
+          "expectedActiveWeeks": 20.605,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1075.525
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1080.232
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1077.253
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1086.928
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1072.537
+            }
+          ],
+          "expectedLockedInTotal": 1077.623,
+          "expectedSelectedStats": {
+            "dd": 15.309,
+            "pf": 49.436,
+            "qd": 0,
+            "td": 0.308,
+            "to": 43.586,
+            "ast": 73.013,
+            "blk": 46.87,
+            "fga": 340.517,
+            "fgm": 177.137,
+            "fta": 115.776,
+            "ftm": 89.669,
+            "min": 766.101,
+            "pts": 457.836,
+            "reb": 268.325,
+            "stl": 25.896,
+            "tpa": 44.267,
+            "tpm": 13.893,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 14.39,
+          "scheduleScenarioStdDev": 3.421,
+          "monteCarloStandardError": 0.974,
+          "expectedFptsPerActiveWeek": 52.298
+        }
+      },
+      {
+        "canonicalPlayerId": "63217b35-d5a1-4f2b-8b16-51e9db3c1ee9",
+        "sleeperPlayerId": "2308",
+        "displayName": "Alperen Şengün",
+        "teamAbbreviation": "HOU",
+        "fantasyPositions": [
+          "C",
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612745",
+        "projectedGames": 68.71575,
+        "projectedMinutes": 2165.082509,
+        "projectedStats": {
+          "dd": 34.160942,
+          "pf": 208.444401,
+          "qd": 0,
+          "td": 3.525093,
+          "to": 179.812399,
+          "ast": 399.187088,
+          "blk": 66.204164,
+          "fga": 976.359235,
+          "fgm": 510.053988,
+          "fta": 337.897295,
+          "ftm": 236.689822,
+          "min": 2165.082509,
+          "pts": 1290.796149,
+          "reb": 676.317649,
+          "stl": 77.807653,
+          "tpa": 111.181859,
+          "tpm": 33.99835,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2958.450062,
+        "projectedFptsPerGame": 43.053453,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 17,
+          "averages": 19
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 17,
+          "averageRank": 18,
+          "projectedGames": 68.716,
+          "profileFallback": false,
+          "p10LockedInTotal": 1052.473,
+          "p50LockedInTotal": 1196.092,
+          "p90LockedInTotal": 1299.446,
+          "canonicalPlayerId": "63217b35-d5a1-4f2b-8b16-51e9db3c1ee9",
+          "projectedTotalFpts": 2958.45,
+          "regularPerGameRank": 19,
+          "expectedActiveWeeks": 23.176,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1182.089
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1182.477
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1185.966
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1189.418
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1194.277
+            }
+          ],
+          "expectedLockedInTotal": 1183.829,
+          "expectedSelectedStats": {
+            "dd": 13.67,
+            "pf": 83.409,
+            "qd": 0,
+            "td": 1.411,
+            "to": 71.952,
+            "ast": 159.735,
+            "blk": 26.492,
+            "fga": 390.692,
+            "fgm": 204.099,
+            "fta": 135.21,
+            "ftm": 94.712,
+            "min": 866.362,
+            "pts": 516.515,
+            "reb": 270.63,
+            "stl": 31.135,
+            "tpa": 44.49,
+            "tpm": 13.605,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 12.188,
+          "scheduleScenarioStdDev": 3.216,
+          "monteCarloStandardError": 0.692,
+          "expectedFptsPerActiveWeek": 51.079
+        }
+      },
+      {
+        "canonicalPlayerId": "e2e9b285-2c80-468a-9d7e-678273c421ef",
+        "sleeperPlayerId": "1945",
+        "displayName": "Trae Young",
+        "teamAbbreviation": "WAS",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612764",
+        "projectedGames": 67.5,
+        "projectedMinutes": 2244.863791,
+        "projectedStats": {
+          "dd": 41.265812,
+          "pf": 135.39896,
+          "qd": 0,
+          "td": 0.010234,
+          "to": 238.678229,
+          "ast": 686.664219,
+          "blk": 13.205081,
+          "fga": 1075.12187,
+          "fgm": 464.340139,
+          "fta": 444.159304,
+          "ftm": 381.314791,
+          "min": 2244.863791,
+          "pts": 1488.427474,
+          "reb": 198.076217,
+          "stl": 74.806785,
+          "tpa": 506.297185,
+          "tpm": 178.432405,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2903.669435,
+        "projectedFptsPerGame": 43.017325,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 20,
+          "averages": 20
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 19,
+          "averageRank": 19,
+          "projectedGames": 67.5,
+          "profileFallback": false,
+          "p10LockedInTotal": 1035.065,
+          "p50LockedInTotal": 1183.089,
+          "p90LockedInTotal": 1291.352,
+          "canonicalPlayerId": "e2e9b285-2c80-468a-9d7e-678273c421ef",
+          "projectedTotalFpts": 2903.669,
+          "regularPerGameRank": 20,
+          "expectedActiveWeeks": 22.993,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1170.945
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1171.083
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1174.753
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1176.151
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1169.175
+            }
+          ],
+          "expectedLockedInTotal": 1171.758,
+          "expectedSelectedStats": {
+            "dd": 16.653,
+            "pf": 54.639,
+            "qd": 0,
+            "td": 0.004,
+            "to": 96.317,
+            "ast": 277.099,
+            "blk": 5.329,
+            "fga": 433.859,
+            "fgm": 187.382,
+            "fta": 179.238,
+            "ftm": 153.877,
+            "min": 905.901,
+            "pts": 600.646,
+            "reb": 79.932,
+            "stl": 30.188,
+            "tpa": 204.313,
+            "tpm": 72.005,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 6.977,
+          "scheduleScenarioStdDev": 1.829,
+          "monteCarloStandardError": 0.719,
+          "expectedFptsPerActiveWeek": 50.962
+        }
+      },
+      {
+        "canonicalPlayerId": "f1433c0f-2a31-464a-853f-1a801ce5f100",
+        "sleeperPlayerId": "1240",
+        "displayName": "James Harden",
+        "teamAbbreviation": "CLE",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612739",
+        "projectedGames": 68,
+        "projectedMinutes": 2355.214776,
+        "projectedStats": {
+          "dd": 22.29576,
+          "pf": 137.248332,
+          "qd": 0,
+          "td": 2.063509,
+          "to": 193.748071,
+          "ast": 566.616888,
+          "blk": 30.720193,
+          "fga": 967.157754,
+          "fgm": 415.870934,
+          "fta": 429.61878,
+          "ftm": 374.627588,
+          "min": 2355.214776,
+          "pts": 1388.527839,
+          "reb": 354.988894,
+          "stl": 78.507159,
+          "tpa": 505.231677,
+          "tpm": 182.158384,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2917.915081,
+        "projectedFptsPerGame": 42.910518,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 18,
+          "averages": 22
+        },
+        "lockIn": {
+          "liDelta": 2,
+          "totalRank": 18,
+          "averageRank": 20,
+          "projectedGames": 68,
+          "profileFallback": false,
+          "p10LockedInTotal": 1039.172,
+          "p50LockedInTotal": 1186.701,
+          "p90LockedInTotal": 1292.618,
+          "canonicalPlayerId": "f1433c0f-2a31-464a-853f-1a801ce5f100",
+          "projectedTotalFpts": 2917.915,
+          "regularPerGameRank": 22,
+          "expectedActiveWeeks": 23.075,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1175.423
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1172.09
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1171.723
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1181.775
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1172.226
+            }
+          ],
+          "expectedLockedInTotal": 1174.444,
+          "expectedSelectedStats": {
+            "dd": 8.974,
+            "pf": 55.242,
+            "qd": 0,
+            "td": 0.831,
+            "to": 77.982,
+            "ast": 228.06,
+            "blk": 12.365,
+            "fga": 389.275,
+            "fgm": 167.386,
+            "fta": 172.919,
+            "ftm": 150.785,
+            "min": 947.96,
+            "pts": 558.874,
+            "reb": 142.881,
+            "stl": 31.599,
+            "tpa": 203.353,
+            "tpm": 73.318,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 10.052,
+          "scheduleScenarioStdDev": 2.658,
+          "monteCarloStandardError": 0.707,
+          "expectedFptsPerActiveWeek": 50.898
+        }
+      },
+      {
+        "canonicalPlayerId": "e36bb208-7a30-4776-aff3-d11347e31738",
+        "sleeperPlayerId": "1362",
+        "displayName": "LeBron James",
+        "teamAbbreviation": "PHI",
+        "fantasyPositions": [
+          "PF",
+          "PG",
+          "SF"
+        ],
+        "teamIdAtCutoff": "1610612755",
+        "projectedGames": 60.6,
+        "projectedMinutes": 1956.162657,
+        "projectedStats": {
+          "dd": 19.901698,
+          "pf": 85.395239,
+          "qd": 0,
+          "td": 4.505813,
+          "to": 172.357353,
+          "ast": 452.006957,
+          "blk": 33.682595,
+          "fga": 877.222272,
+          "fgm": 453.527359,
+          "fta": 274.585673,
+          "ftm": 205.435865,
+          "min": 1956.162657,
+          "pts": 1225.461762,
+          "reb": 372.983914,
+          "stl": 66.232231,
+          "tpa": 286.137135,
+          "tpm": 112.97118,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2631.058006,
+        "projectedFptsPerGame": 43.416797,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 34,
+          "averages": 18
+        },
+        "lockIn": {
+          "liDelta": -3,
+          "totalRank": 32,
+          "averageRank": 21,
+          "projectedGames": 60.6,
+          "profileFallback": false,
+          "p10LockedInTotal": 945.257,
+          "p50LockedInTotal": 1117.951,
+          "p90LockedInTotal": 1254.883,
+          "canonicalPlayerId": "e36bb208-7a30-4776-aff3-d11347e31738",
+          "projectedTotalFpts": 2631.058,
+          "regularPerGameRank": 18,
+          "expectedActiveWeeks": 21.769,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1106.46
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1104.743
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1110.013
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1109.996
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1113.159
+            }
+          ],
+          "expectedLockedInTotal": 1107.075,
+          "expectedSelectedStats": {
+            "dd": 8.374,
+            "pf": 35.932,
+            "qd": 0,
+            "td": 1.896,
+            "to": 72.523,
+            "ast": 190.192,
+            "blk": 14.173,
+            "fga": 369.11,
+            "fgm": 190.832,
+            "fta": 115.538,
+            "ftm": 86.442,
+            "min": 823.098,
+            "pts": 515.64,
+            "reb": 156.941,
+            "stl": 27.869,
+            "tpa": 120.398,
+            "tpm": 47.535,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.416,
+          "scheduleScenarioStdDev": 2.262,
+          "monteCarloStandardError": 0.853,
+          "expectedFptsPerActiveWeek": 50.856
+        }
+      },
+      {
+        "canonicalPlayerId": "c6da3721-5e0c-4bbf-ab59-4d3373fcb242",
+        "sleeperPlayerId": "2179",
+        "displayName": "LaMelo Ball",
+        "teamAbbreviation": "MIN",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612750",
+        "projectedGames": 65.8,
+        "projectedMinutes": 2042.428455,
+        "projectedStats": {
+          "dd": 12.290858,
+          "pf": 200.423096,
+          "qd": 0,
+          "td": 0.811865,
+          "to": 190.432743,
+          "ast": 504.857827,
+          "blk": 18.827922,
+          "fga": 1180.899679,
+          "fgm": 490.183269,
+          "fta": 207.750827,
+          "ftm": 181.729486,
+          "min": 2042.428455,
+          "pts": 1406.013928,
+          "reb": 343.295303,
+          "stl": 87.768733,
+          "tpa": 667.428277,
+          "tpm": 243.917904,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2821.909441,
+        "projectedFptsPerGame": 42.886161,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 23,
+          "averages": 23
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 21,
+          "averageRank": 22,
+          "projectedGames": 65.8,
+          "profileFallback": false,
+          "p10LockedInTotal": 1009.292,
+          "p50LockedInTotal": 1166.076,
+          "p90LockedInTotal": 1279.758,
+          "canonicalPlayerId": "c6da3721-5e0c-4bbf-ab59-4d3373fcb242",
+          "projectedTotalFpts": 2821.909,
+          "regularPerGameRank": 23,
+          "expectedActiveWeeks": 22.725,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1154.45
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1154.536
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1151.674
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1150.741
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1152.644
+            }
+          ],
+          "expectedLockedInTotal": 1153.756,
+          "expectedSelectedStats": {
+            "dd": 5.025,
+            "pf": 81.944,
+            "qd": 0,
+            "td": 0.332,
+            "to": 77.86,
+            "ast": 206.414,
+            "blk": 7.698,
+            "fga": 482.818,
+            "fgm": 200.415,
+            "fta": 84.94,
+            "ftm": 74.301,
+            "min": 835.06,
+            "pts": 574.858,
+            "reb": 140.359,
+            "stl": 35.885,
+            "tpa": 272.882,
+            "tpm": 99.727,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 3.795,
+          "scheduleScenarioStdDev": 1.296,
+          "monteCarloStandardError": 0.75,
+          "expectedFptsPerActiveWeek": 50.771
+        }
+      },
+      {
+        "canonicalPlayerId": "00079d41-a328-40e8-80bf-258dc0bad32e",
+        "sleeperPlayerId": "2161",
+        "displayName": "Tyrese Haliburton",
+        "teamAbbreviation": "IND",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612754",
+        "projectedGames": 63,
+        "projectedMinutes": 1970.736172,
+        "projectedStats": {
+          "dd": 26.649773,
+          "pf": 75.618194,
+          "qd": 0,
+          "td": 0.200769,
+          "to": 105.946345,
+          "ast": 516.344455,
+          "blk": 34.777704,
+          "fga": 826.071215,
+          "fgm": 394.631626,
+          "fta": 184.142246,
+          "ftm": 156.104043,
+          "min": 1970.736172,
+          "pts": 1115.224839,
+          "reb": 226.055017,
+          "stl": 73.844619,
+          "tpa": 441.542863,
+          "tpm": 169.857543,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2701.576745,
+        "projectedFptsPerGame": 42.882171,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 30,
+          "averages": 24
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 27,
+          "averageRank": 23,
+          "projectedGames": 63,
+          "profileFallback": false,
+          "p10LockedInTotal": 971.255,
+          "p50LockedInTotal": 1137.828,
+          "p90LockedInTotal": 1262.463,
+          "canonicalPlayerId": "00079d41-a328-40e8-80bf-258dc0bad32e",
+          "projectedTotalFpts": 2701.577,
+          "regularPerGameRank": 24,
+          "expectedActiveWeeks": 22.259,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1126.204
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1124.074
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1122.857
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1125.223
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1130.935
+            }
+          ],
+          "expectedLockedInTotal": 1125.416,
+          "expectedSelectedStats": {
+            "dd": 11.102,
+            "pf": 31.501,
+            "qd": 0,
+            "td": 0.084,
+            "to": 44.135,
+            "ast": 215.097,
+            "blk": 14.488,
+            "fga": 344.123,
+            "fgm": 164.395,
+            "fta": 76.709,
+            "ftm": 65.029,
+            "min": 820.964,
+            "pts": 464.577,
+            "reb": 94.169,
+            "stl": 30.762,
+            "tpa": 183.937,
+            "tpm": 70.759,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.077,
+          "scheduleScenarioStdDev": 1.762,
+          "monteCarloStandardError": 0.808,
+          "expectedFptsPerActiveWeek": 50.561
+        }
+      },
+      {
+        "canonicalPlayerId": "b57e443c-48f0-4ff5-8324-f8f8ea579b9c",
+        "sleeperPlayerId": "2313",
+        "displayName": "Josh Giddey",
+        "teamAbbreviation": "CHI",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612741",
+        "projectedGames": 62.131515,
+        "projectedMinutes": 1962.638889,
+        "projectedStats": {
+          "dd": 28.114513,
+          "pf": 111.740368,
+          "qd": 0,
+          "td": 10.516141,
+          "to": 210.135819,
+          "ast": 531.611309,
+          "blk": 35.520546,
+          "fga": 827.761195,
+          "fgm": 386.379125,
+          "fta": 239.202363,
+          "ftm": 186.261357,
+          "min": 1962.638889,
+          "pts": 1073.421065,
+          "reb": 517.107086,
+          "stl": 67.244513,
+          "tpa": 305.223884,
+          "tpm": 114.401457,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2650.996873,
+        "projectedFptsPerGame": 42.667505,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 33,
+          "averages": 25
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 31,
+          "averageRank": 24,
+          "projectedGames": 62.132,
+          "profileFallback": false,
+          "p10LockedInTotal": 952.561,
+          "p50LockedInTotal": 1119.856,
+          "p90LockedInTotal": 1249.995,
+          "canonicalPlayerId": "b57e443c-48f0-4ff5-8324-f8f8ea579b9c",
+          "projectedTotalFpts": 2650.997,
+          "regularPerGameRank": 25,
+          "expectedActiveWeeks": 22.071,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1109.938
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1108.457
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1109.14
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1106.564
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1103.473
+            }
+          ],
+          "expectedLockedInTotal": 1108.891,
+          "expectedSelectedStats": {
+            "dd": 11.76,
+            "pf": 46.74,
+            "qd": 0,
+            "td": 4.399,
+            "to": 87.898,
+            "ast": 222.369,
+            "blk": 14.858,
+            "fga": 346.246,
+            "fgm": 161.619,
+            "fta": 100.056,
+            "ftm": 77.912,
+            "min": 820.957,
+            "pts": 449.004,
+            "reb": 216.302,
+            "stl": 28.128,
+            "tpa": 127.673,
+            "tpm": 47.853,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 6.464,
+          "scheduleScenarioStdDev": 1.574,
+          "monteCarloStandardError": 0.82,
+          "expectedFptsPerActiveWeek": 50.243
+        }
+      },
+      {
+        "canonicalPlayerId": "2cac0d89-e136-4ace-a47f-d206d0aa7596",
+        "sleeperPlayerId": "2259",
+        "displayName": "Evan Mobley",
+        "teamAbbreviation": "CLE",
+        "fantasyPositions": [
+          "C",
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612739",
+        "projectedGames": 65.661818,
+        "projectedMinutes": 2219.187738,
+        "projectedStats": {
+          "dd": 32.055959,
+          "pf": 164.987315,
+          "qd": 0,
+          "td": 0.005687,
+          "to": 128.7834,
+          "ast": 237.869186,
+          "blk": 108.50233,
+          "fga": 860.746191,
+          "fgm": 476.367167,
+          "fta": 292.390882,
+          "ftm": 190.546867,
+          "min": 2219.187738,
+          "pts": 1208.987017,
+          "reb": 644.269036,
+          "stl": 54.592018,
+          "tpa": 203.68803,
+          "tpm": 65.705816,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2779.654961,
+        "projectedFptsPerGame": 42.332898,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 25,
+          "averages": 27
+        },
+        "lockIn": {
+          "liDelta": 2,
+          "totalRank": 25,
+          "averageRank": 25,
+          "projectedGames": 65.662,
+          "profileFallback": false,
+          "p10LockedInTotal": 994.592,
+          "p50LockedInTotal": 1148.719,
+          "p90LockedInTotal": 1263.837,
+          "canonicalPlayerId": "2cac0d89-e136-4ace-a47f-d206d0aa7596",
+          "projectedTotalFpts": 2779.655,
+          "regularPerGameRank": 27,
+          "expectedActiveWeeks": 22.687,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1138.89
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1135.694
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1134.376
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1143.666
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1135.488
+            }
+          ],
+          "expectedLockedInTotal": 1137.715,
+          "expectedSelectedStats": {
+            "dd": 13.121,
+            "pf": 67.529,
+            "qd": 0,
+            "td": 0.002,
+            "to": 52.711,
+            "ast": 97.36,
+            "blk": 44.41,
+            "fga": 352.304,
+            "fgm": 194.977,
+            "fta": 119.676,
+            "ftm": 77.991,
+            "min": 908.315,
+            "pts": 494.839,
+            "reb": 263.7,
+            "stl": 22.345,
+            "tpa": 83.37,
+            "tpm": 26.893,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 9.29,
+          "scheduleScenarioStdDev": 2.451,
+          "monteCarloStandardError": 0.751,
+          "expectedFptsPerActiveWeek": 50.147
+        }
+      },
+      {
+        "canonicalPlayerId": "25d1b369-a882-4062-a53f-76844199de27",
+        "sleeperPlayerId": "1967",
+        "displayName": "Jalen Brunson",
+        "teamAbbreviation": "NYK",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612752",
+        "projectedGames": 65.3,
+        "projectedMinutes": 2200.104224,
+        "projectedStats": {
+          "dd": 10.525099,
+          "pf": 147.999654,
+          "qd": 0,
+          "td": 0.004352,
+          "to": 157.927391,
+          "ast": 449.634527,
+          "blk": 0,
+          "fga": 1248.40187,
+          "fgm": 591.76612,
+          "fta": 391.494986,
+          "ftm": 331.118224,
+          "min": 2200.104224,
+          "pts": 1684.579353,
+          "reb": 189.285613,
+          "stl": 64.56757,
+          "tpa": 450.517733,
+          "tpm": 169.928888,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2760.232014,
+        "projectedFptsPerGame": 42.270016,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 27,
+          "averages": 28
+        },
+        "lockIn": {
+          "liDelta": 2,
+          "totalRank": 26,
+          "averageRank": 26,
+          "projectedGames": 65.3,
+          "profileFallback": false,
+          "p10LockedInTotal": 994.224,
+          "p50LockedInTotal": 1146.603,
+          "p90LockedInTotal": 1263.2,
+          "canonicalPlayerId": "25d1b369-a882-4062-a53f-76844199de27",
+          "projectedTotalFpts": 2760.232,
+          "regularPerGameRank": 28,
+          "expectedActiveWeeks": 22.653,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1136.716
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1135.287
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1131.391
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1135.984
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1134.793
+            }
+          ],
+          "expectedLockedInTotal": 1135.542,
+          "expectedSelectedStats": {
+            "dd": 4.33,
+            "pf": 60.886,
+            "qd": 0,
+            "td": 0.002,
+            "to": 64.97,
+            "ast": 184.977,
+            "blk": 0,
+            "fga": 513.585,
+            "fgm": 243.449,
+            "fta": 161.059,
+            "ftm": 136.22,
+            "min": 905.109,
+            "pts": 693.025,
+            "reb": 77.871,
+            "stl": 26.563,
+            "tpa": 185.34,
+            "tpm": 69.908,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 5.325,
+          "scheduleScenarioStdDev": 1.703,
+          "monteCarloStandardError": 0.76,
+          "expectedFptsPerActiveWeek": 50.128
+        }
+      },
+      {
+        "canonicalPlayerId": "443460f7-e49b-467b-b13e-b2e6c0ba0c96",
+        "sleeperPlayerId": "2574",
+        "displayName": "Amen Thompson",
+        "teamAbbreviation": "HOU",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612745",
+        "projectedGames": 69.471188,
+        "projectedMinutes": 2466.282151,
+        "projectedStats": {
+          "dd": 19.507235,
+          "pf": 162.340627,
+          "qd": 0,
+          "td": 0.996589,
+          "to": 156.902668,
+          "ast": 361.714805,
+          "blk": 67.646596,
+          "fga": 870.469886,
+          "fgm": 470.909938,
+          "fta": 313.939959,
+          "ftm": 239.022469,
+          "min": 2466.282151,
+          "pts": 1209.382342,
+          "reb": 573.375368,
+          "stl": 105.06362,
+          "tpa": 110.592486,
+          "tpm": 28.539996,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2908.195344,
+        "projectedFptsPerGame": 41.861894,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 19,
+          "averages": 30
+        },
+        "lockIn": {
+          "liDelta": 3,
+          "totalRank": 20,
+          "averageRank": 27,
+          "projectedGames": 69.471,
+          "profileFallback": false,
+          "p10LockedInTotal": 1036.264,
+          "p50LockedInTotal": 1174.404,
+          "p90LockedInTotal": 1272.761,
+          "canonicalPlayerId": "443460f7-e49b-467b-b13e-b2e6c0ba0c96",
+          "projectedTotalFpts": 2908.195,
+          "regularPerGameRank": 30,
+          "expectedActiveWeeks": 23.284,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1160.493
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1162.961
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1164.522
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1167.372
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1168.982
+            }
+          ],
+          "expectedLockedInTotal": 1162.554,
+          "expectedSelectedStats": {
+            "dd": 7.798,
+            "pf": 64.896,
+            "qd": 0,
+            "td": 0.398,
+            "to": 62.722,
+            "ast": 144.596,
+            "blk": 27.042,
+            "fga": 347.971,
+            "fgm": 188.247,
+            "fta": 125.498,
+            "ftm": 95.549,
+            "min": 985.899,
+            "pts": 483.452,
+            "reb": 229.207,
+            "stl": 41.999,
+            "tpa": 44.209,
+            "tpm": 11.409,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 8.489,
+          "scheduleScenarioStdDev": 2.541,
+          "monteCarloStandardError": 0.671,
+          "expectedFptsPerActiveWeek": 49.929
+        }
+      },
+      {
+        "canonicalPlayerId": "0d5d1ca8-72da-443c-b49f-cd59fe729507",
+        "sleeperPlayerId": "1054",
+        "displayName": "Kyrie Irving",
+        "teamAbbreviation": "DAL",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612742",
+        "projectedGames": 54,
+        "projectedMinutes": 1833.720116,
+        "projectedStats": {
+          "dd": 1.444897,
+          "pf": 107.233636,
+          "qd": 0,
+          "td": 0.013258,
+          "to": 114.462352,
+          "ast": 280.158449,
+          "blk": 24.839237,
+          "fga": 988.090218,
+          "fgm": 472.48506,
+          "fta": 225.829708,
+          "ftm": 202.905764,
+          "min": 1833.720116,
+          "pts": 1297.956905,
+          "reb": 261.704898,
+          "stl": 61.638106,
+          "tpa": 380.15979,
+          "tpm": 150.081021,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2321.000348,
+        "projectedFptsPerGame": 42.981485,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 61,
+          "averages": 21
+        },
+        "lockIn": {
+          "liDelta": -7,
+          "totalRank": 52,
+          "averageRank": 28,
+          "projectedGames": 54,
+          "profileFallback": false,
+          "p10LockedInTotal": 836.266,
+          "p50LockedInTotal": 1027.727,
+          "p90LockedInTotal": 1188.143,
+          "canonicalPlayerId": "0d5d1ca8-72da-443c-b49f-cd59fe729507",
+          "projectedTotalFpts": 2321,
+          "regularPerGameRank": 21,
+          "expectedActiveWeeks": 20.389,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1016.938
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1019.777
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1017.184
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1020.578
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1016.782
+            }
+          ],
+          "expectedLockedInTotal": 1017.944,
+          "expectedSelectedStats": {
+            "dd": 0.634,
+            "pf": 47.03,
+            "qd": 0,
+            "td": 0.006,
+            "to": 50.201,
+            "ast": 122.872,
+            "blk": 10.894,
+            "fga": 433.356,
+            "fgm": 207.222,
+            "fta": 99.044,
+            "ftm": 88.99,
+            "min": 804.232,
+            "pts": 569.258,
+            "reb": 114.778,
+            "stl": 27.033,
+            "tpa": 166.73,
+            "tpm": 65.822,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 3.796,
+          "scheduleScenarioStdDev": 1.416,
+          "monteCarloStandardError": 0.967,
+          "expectedFptsPerActiveWeek": 49.927
+        }
+      },
+      {
+        "canonicalPlayerId": "fad60589-efd6-4f56-ab61-4656cb25238f",
+        "sleeperPlayerId": "1085",
+        "displayName": "Stephen Curry",
+        "teamAbbreviation": "GSW",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612744",
+        "projectedGames": 58.798182,
+        "projectedMinutes": 1901.378113,
+        "projectedStats": {
+          "dd": 5.708837,
+          "pf": 96.065983,
+          "qd": 0,
+          "td": 0.005748,
+          "to": 139.35165,
+          "ast": 322.218276,
+          "blk": 20.320071,
+          "fga": 1033.643653,
+          "fgm": 474.108873,
+          "fta": 258.915366,
+          "ftm": 239.127432,
+          "min": 1901.378113,
+          "pts": 1434.199381,
+          "reb": 235.132255,
+          "stl": 60.960214,
+          "tpa": 617.818328,
+          "tpm": 246.854202,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2501.826389,
+        "projectedFptsPerGame": 42.549382,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 46,
+          "averages": 26
+        },
+        "lockIn": {
+          "liDelta": -3,
+          "totalRank": 39,
+          "averageRank": 29,
+          "projectedGames": 58.798,
+          "profileFallback": false,
+          "p10LockedInTotal": 905.081,
+          "p50LockedInTotal": 1081.369,
+          "p90LockedInTotal": 1221.114,
+          "canonicalPlayerId": "fad60589-efd6-4f56-ab61-4656cb25238f",
+          "projectedTotalFpts": 2501.826,
+          "regularPerGameRank": 26,
+          "expectedActiveWeeks": 21.443,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1071.171
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1069.321
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1067.492
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1073.313
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1071.55
+            }
+          ],
+          "expectedLockedInTotal": 1070.428,
+          "expectedSelectedStats": {
+            "dd": 2.443,
+            "pf": 41.103,
+            "qd": 0,
+            "td": 0.002,
+            "to": 59.623,
+            "ast": 137.864,
+            "blk": 8.694,
+            "fga": 442.253,
+            "fgm": 202.852,
+            "fta": 110.779,
+            "ftm": 102.313,
+            "min": 813.521,
+            "pts": 613.635,
+            "reb": 100.603,
+            "stl": 26.082,
+            "tpa": 264.339,
+            "tpm": 105.619,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 5.821,
+          "scheduleScenarioStdDev": 1.532,
+          "monteCarloStandardError": 0.878,
+          "expectedFptsPerActiveWeek": 49.919
+        }
+      },
+      {
+        "canonicalPlayerId": "b7323fdd-3109-47e1-b06a-998dbab11d4a",
+        "sleeperPlayerId": "2007",
+        "displayName": "Darius Garland",
+        "teamAbbreviation": "LAC",
+        "fantasyPositions": [
+          "PG"
+        ],
+        "teamIdAtCutoff": "1610612746",
+        "projectedGames": 59.991281,
+        "projectedMinutes": 1947.38285,
+        "projectedStats": {
+          "dd": 8.372337,
+          "pf": 126.3192,
+          "qd": 0,
+          "td": 0.006279,
+          "to": 176.020433,
+          "ast": 465.92926,
+          "blk": 12.545818,
+          "fga": 1032.126878,
+          "fgm": 483.417353,
+          "fta": 211.124808,
+          "ftm": 182.299984,
+          "min": 1947.38285,
+          "pts": 1331.812592,
+          "reb": 187.484402,
+          "stl": 70.35669,
+          "tpa": 458.836463,
+          "tpm": 182.677902,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2519.285586,
+        "projectedFptsPerGame": 41.994195,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 41,
+          "averages": 29
+        },
+        "lockIn": {
+          "liDelta": -1,
+          "totalRank": 40,
+          "averageRank": 30,
+          "projectedGames": 59.991,
+          "profileFallback": false,
+          "p10LockedInTotal": 906.864,
+          "p50LockedInTotal": 1077.219,
+          "p90LockedInTotal": 1212.989,
+          "canonicalPlayerId": "b7323fdd-3109-47e1-b06a-998dbab11d4a",
+          "projectedTotalFpts": 2519.286,
+          "regularPerGameRank": 29,
+          "expectedActiveWeeks": 21.624,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1068.943
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1061.783
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1065.709
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1071.243
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1069.607
+            }
+          ],
+          "expectedLockedInTotal": 1066.954,
+          "expectedSelectedStats": {
+            "dd": 3.546,
+            "pf": 53.498,
+            "qd": 0,
+            "td": 0.003,
+            "to": 74.547,
+            "ast": 197.328,
+            "blk": 5.313,
+            "fga": 437.121,
+            "fgm": 204.734,
+            "fta": 89.414,
+            "ftm": 77.207,
+            "min": 824.745,
+            "pts": 564.042,
+            "reb": 79.402,
+            "stl": 29.797,
+            "tpa": 194.324,
+            "tpm": 77.367,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 9.46,
+          "scheduleScenarioStdDev": 3.254,
+          "monteCarloStandardError": 0.849,
+          "expectedFptsPerActiveWeek": 49.341
+        }
+      },
+      {
+        "canonicalPlayerId": "8ea9e659-3836-41ac-84bc-f72e85ac8778",
+        "sleeperPlayerId": "2316",
+        "displayName": "Austin Reaves",
+        "teamAbbreviation": "LAL",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612747",
+        "projectedGames": 61.813333,
+        "projectedMinutes": 2199.12805,
+        "projectedStats": {
+          "dd": 8.087011,
+          "pf": 138.55933,
+          "qd": 0,
+          "td": 0.451575,
+          "to": 165.857309,
+          "ast": 384.533248,
+          "blk": 23.247925,
+          "fga": 939.56418,
+          "fgm": 453.736329,
+          "fta": 385.51085,
+          "ftm": 335.001317,
+          "min": 2199.12805,
+          "pts": 1402.586852,
+          "reb": 314.16115,
+          "stl": 64.088875,
+          "tpa": 431.960374,
+          "tpm": 160.112876,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2580.958901,
+        "projectedFptsPerGame": 41.754081,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 37,
+          "averages": 31
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 34,
+          "averageRank": 31,
+          "projectedGames": 61.813,
+          "profileFallback": false,
+          "p10LockedInTotal": 932.638,
+          "p50LockedInTotal": 1096.495,
+          "p90LockedInTotal": 1223.571,
+          "canonicalPlayerId": "8ea9e659-3836-41ac-84bc-f72e85ac8778",
+          "projectedTotalFpts": 2580.959,
+          "regularPerGameRank": 31,
+          "expectedActiveWeeks": 22.014,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1085.614
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1085.886
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1086.173
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1090.474
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1077.649
+            }
+          ],
+          "expectedLockedInTotal": 1085.718,
+          "expectedSelectedStats": {
+            "dd": 3.402,
+            "pf": 58.287,
+            "qd": 0,
+            "td": 0.19,
+            "to": 69.77,
+            "ast": 161.76,
+            "blk": 9.78,
+            "fga": 395.241,
+            "fgm": 190.871,
+            "fta": 162.171,
+            "ftm": 140.923,
+            "min": 925.095,
+            "pts": 590.019,
+            "reb": 132.156,
+            "stl": 26.96,
+            "tpa": 181.71,
+            "tpm": 67.354,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 12.825,
+          "scheduleScenarioStdDev": 2.234,
+          "monteCarloStandardError": 0.808,
+          "expectedFptsPerActiveWeek": 49.319
+        }
+      },
+      {
+        "canonicalPlayerId": "9e8df1a4-7b55-43b4-aaf4-2fa459c66cb1",
+        "sleeperPlayerId": "1711",
+        "displayName": "Jaylen Brown",
+        "teamAbbreviation": "PHI",
+        "fantasyPositions": [
+          "PF",
+          "SF",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612755",
+        "projectedGames": 65.859483,
+        "projectedMinutes": 2163.312531,
+        "projectedStats": {
+          "dd": 9.760111,
+          "pf": 174.285935,
+          "qd": 0,
+          "td": 1.786759,
+          "to": 175.813604,
+          "ast": 322.779965,
+          "blk": 30.217699,
+          "fga": 1205.771174,
+          "fgm": 577.246061,
+          "fta": 371.703949,
+          "ftm": 290.21323,
+          "min": 2163.312531,
+          "pts": 1575.759433,
+          "reb": 438.568693,
+          "stl": 75.544247,
+          "tpa": 378.459985,
+          "tpm": 131.054082,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2729.592943,
+        "projectedFptsPerGame": 41.445711,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 29,
+          "averages": 32
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 29,
+          "averageRank": 32,
+          "projectedGames": 65.859,
+          "profileFallback": false,
+          "p10LockedInTotal": 977.233,
+          "p50LockedInTotal": 1130.311,
+          "p90LockedInTotal": 1243.797,
+          "canonicalPlayerId": "9e8df1a4-7b55-43b4-aaf4-2fa459c66cb1",
+          "projectedTotalFpts": 2729.593,
+          "regularPerGameRank": 32,
+          "expectedActiveWeeks": 22.715,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1118.479
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1119.884
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1121.562
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1117.931
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1117.924
+            }
+          ],
+          "expectedLockedInTotal": 1119.147,
+          "expectedSelectedStats": {
+            "dd": 4.002,
+            "pf": 71.458,
+            "qd": 0,
+            "td": 0.733,
+            "to": 72.084,
+            "ast": 132.341,
+            "blk": 12.389,
+            "fga": 494.372,
+            "fgm": 236.674,
+            "fta": 152.4,
+            "ftm": 118.989,
+            "min": 886.969,
+            "pts": 646.069,
+            "reb": 179.815,
+            "stl": 30.974,
+            "tpa": 155.171,
+            "tpm": 53.733,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 3.638,
+          "scheduleScenarioStdDev": 1.129,
+          "monteCarloStandardError": 0.738,
+          "expectedFptsPerActiveWeek": 49.269
+        }
+      },
+      {
+        "canonicalPlayerId": "e0000a84-ae42-4c29-bd19-d2202ed62424",
+        "sleeperPlayerId": "1846",
+        "displayName": "Bam Adebayo",
+        "teamAbbreviation": "MIA",
+        "fantasyPositions": [
+          "C",
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612748",
+        "projectedGames": 70,
+        "projectedMinutes": 2380.897132,
+        "projectedStats": {
+          "dd": 36.035909,
+          "pf": 135.654706,
+          "qd": 0,
+          "td": 0.496222,
+          "to": 123.007412,
+          "ast": 270.071914,
+          "blk": 56.857245,
+          "fga": 1067.478203,
+          "fgm": 492.351447,
+          "fta": 367.800156,
+          "ftm": 283.822108,
+          "min": 2380.897132,
+          "pts": 1366.749085,
+          "reb": 710.715562,
+          "stl": 85.285867,
+          "tpa": 300.124075,
+          "tpm": 98.224083,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2871.636825,
+        "projectedFptsPerGame": 41.023382,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 21,
+          "averages": 34
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 22,
+          "averageRank": 33,
+          "projectedGames": 70,
+          "profileFallback": false,
+          "p10LockedInTotal": 1028.493,
+          "p50LockedInTotal": 1161.038,
+          "p90LockedInTotal": 1254.933,
+          "canonicalPlayerId": "e0000a84-ae42-4c29-bd19-d2202ed62424",
+          "projectedTotalFpts": 2871.637,
+          "regularPerGameRank": 34,
+          "expectedActiveWeeks": 23.389,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1149.242
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1147.739
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1145.849
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1156.524
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1151.996
+            }
+          ],
+          "expectedLockedInTotal": 1149.126,
+          "expectedSelectedStats": {
+            "dd": 14.42,
+            "pf": 54.284,
+            "qd": 0,
+            "td": 0.199,
+            "to": 49.223,
+            "ast": 108.073,
+            "blk": 22.752,
+            "fga": 427.166,
+            "fgm": 197.021,
+            "fta": 147.18,
+            "ftm": 113.575,
+            "min": 952.749,
+            "pts": 546.924,
+            "reb": 284.403,
+            "stl": 34.128,
+            "tpa": 120.099,
+            "tpm": 39.306,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 10.675,
+          "scheduleScenarioStdDev": 2.519,
+          "monteCarloStandardError": 0.645,
+          "expectedFptsPerActiveWeek": 49.132
+        }
+      },
+      {
+        "canonicalPlayerId": "daca9d3a-8581-4eac-aac6-4e6b48c9b3d2",
+        "sleeperPlayerId": "1613",
+        "displayName": "Karl-Anthony Towns",
+        "teamAbbreviation": "NYK",
+        "fantasyPositions": [
+          "C",
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612752",
+        "projectedGames": 68.855207,
+        "projectedMinutes": 2227.299661,
+        "projectedStats": {
+          "dd": 48.623596,
+          "pf": 228.277244,
+          "qd": 0,
+          "td": 0.826225,
+          "to": 162.897384,
+          "ast": 205.596892,
+          "blk": 42.490024,
+          "fga": 972.129547,
+          "fgm": 502.485881,
+          "fta": 354.695916,
+          "ftm": 305.432594,
+          "min": 2227.299661,
+          "pts": 1431.920549,
+          "reb": 781.268189,
+          "stl": 61.679068,
+          "tpa": 298.864151,
+          "tpm": 121.516193,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2820.359208,
+        "projectedFptsPerGame": 40.960724,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 24,
+          "averages": 35
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 23,
+          "averageRank": 34,
+          "projectedGames": 68.855,
+          "profileFallback": false,
+          "p10LockedInTotal": 1015.487,
+          "p50LockedInTotal": 1153.637,
+          "p90LockedInTotal": 1252.308,
+          "canonicalPlayerId": "daca9d3a-8581-4eac-aac6-4e6b48c9b3d2",
+          "projectedTotalFpts": 2820.359,
+          "regularPerGameRank": 35,
+          "expectedActiveWeeks": 23.255,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1142.635
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1141.356
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1141.85
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1141.694
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1136.319
+            }
+          ],
+          "expectedLockedInTotal": 1141.831,
+          "expectedSelectedStats": {
+            "dd": 19.685,
+            "pf": 92.419,
+            "qd": 0,
+            "td": 0.334,
+            "to": 65.949,
+            "ast": 83.237,
+            "blk": 17.202,
+            "fga": 393.57,
+            "fgm": 203.433,
+            "fta": 143.6,
+            "ftm": 123.655,
+            "min": 901.729,
+            "pts": 579.717,
+            "reb": 316.299,
+            "stl": 24.971,
+            "tpa": 120.996,
+            "tpm": 49.196,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 6.317,
+          "scheduleScenarioStdDev": 1.379,
+          "monteCarloStandardError": 0.669,
+          "expectedFptsPerActiveWeek": 49.101
+        }
+      },
+      {
+        "canonicalPlayerId": "d889e969-d1cb-452b-877f-9b53e1b8706f",
+        "sleeperPlayerId": "1830",
+        "displayName": "Derrick White",
+        "teamAbbreviation": "BOS",
+        "fantasyPositions": [
+          "PG",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612738",
+        "projectedGames": 70.25398,
+        "projectedMinutes": 2442.125509,
+        "projectedStats": {
+          "dd": 2.290252,
+          "pf": 124.807349,
+          "qd": 0,
+          "td": 0.097374,
+          "to": 135.197804,
+          "ast": 376.137682,
+          "blk": 90.968805,
+          "fga": 1020.247798,
+          "fgm": 435.426162,
+          "fta": 195.372549,
+          "ftm": 171.146353,
+          "min": 2442.125509,
+          "pts": 1286.913159,
+          "reb": 328.035658,
+          "stl": 77.780735,
+          "tpa": 650.21219,
+          "tpm": 244.914482,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2843.119545,
+        "projectedFptsPerGame": 40.469158,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 22,
+          "averages": 38
+        },
+        "lockIn": {
+          "liDelta": 3,
+          "totalRank": 24,
+          "averageRank": 35,
+          "projectedGames": 70.254,
+          "profileFallback": false,
+          "p10LockedInTotal": 1015.799,
+          "p50LockedInTotal": 1150.255,
+          "p90LockedInTotal": 1244.48,
+          "canonicalPlayerId": "d889e969-d1cb-452b-877f-9b53e1b8706f",
+          "projectedTotalFpts": 2843.12,
+          "regularPerGameRank": 38,
+          "expectedActiveWeeks": 23.419,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1135.996
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1141.267
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1139.393
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1139.669
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1145.454
+            }
+          ],
+          "expectedLockedInTotal": 1138.487,
+          "expectedSelectedStats": {
+            "dd": 0.917,
+            "pf": 49.977,
+            "qd": 0,
+            "td": 0.039,
+            "to": 54.138,
+            "ast": 150.619,
+            "blk": 36.427,
+            "fga": 408.544,
+            "fgm": 174.36,
+            "fta": 78.234,
+            "ftm": 68.533,
+            "min": 977.914,
+            "pts": 515.326,
+            "reb": 131.357,
+            "stl": 31.146,
+            "tpa": 260.368,
+            "tpm": 98.073,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 9.457,
+          "scheduleScenarioStdDev": 2.769,
+          "monteCarloStandardError": 0.644,
+          "expectedFptsPerActiveWeek": 48.614
+        }
+      },
+      {
+        "canonicalPlayerId": "17249afe-cc59-425e-bcf7-9222f71efc87",
+        "sleeperPlayerId": "2453",
+        "displayName": "Jalen Williams",
+        "teamAbbreviation": "OKC",
+        "fantasyPositions": [
+          "PF",
+          "SF",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612760",
+        "projectedGames": 61.5,
+        "projectedMinutes": 1954.294712,
+        "projectedStats": {
+          "dd": 2.583349,
+          "pf": 141.952894,
+          "qd": 0,
+          "td": 0.007214,
+          "to": 117.730545,
+          "ast": 336.191525,
+          "blk": 33.460242,
+          "fga": 945.793657,
+          "fgm": 469.708943,
+          "fta": 250.791494,
+          "ftm": 204.167238,
+          "min": 1954.294712,
+          "pts": 1228.409072,
+          "reb": 322.862271,
+          "stl": 91.194426,
+          "tpa": 234.512769,
+          "tpm": 84.823947,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2518.635895,
+        "projectedFptsPerGame": 40.953428,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 42,
+          "averages": 36
+        },
+        "lockIn": {
+          "liDelta": 0,
+          "totalRank": 41,
+          "averageRank": 36,
+          "projectedGames": 61.5,
+          "profileFallback": false,
+          "p10LockedInTotal": 912.046,
+          "p50LockedInTotal": 1076.547,
+          "p90LockedInTotal": 1204.421,
+          "canonicalPlayerId": "17249afe-cc59-425e-bcf7-9222f71efc87",
+          "projectedTotalFpts": 2518.636,
+          "regularPerGameRank": 36,
+          "expectedActiveWeeks": 21.964,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1065.036
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1063.628
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1064.201
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1066.83
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1068.363
+            }
+          ],
+          "expectedLockedInTotal": 1064.88,
+          "expectedSelectedStats": {
+            "dd": 1.092,
+            "pf": 60.018,
+            "qd": 0,
+            "td": 0.003,
+            "to": 49.777,
+            "ast": 142.142,
+            "blk": 14.147,
+            "fga": 399.882,
+            "fgm": 198.593,
+            "fta": 106.035,
+            "ftm": 86.322,
+            "min": 826.277,
+            "pts": 519.372,
+            "reb": 136.506,
+            "stl": 38.557,
+            "tpa": 99.152,
+            "tpm": 35.864,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 4.736,
+          "scheduleScenarioStdDev": 1.164,
+          "monteCarloStandardError": 0.808,
+          "expectedFptsPerActiveWeek": 48.482
+        }
+      },
+      {
+        "canonicalPlayerId": "b9a3765b-dbe8-490d-b2bb-4822603914dc",
+        "sleeperPlayerId": "1739",
+        "displayName": "Domantas Sabonis",
+        "teamAbbreviation": "SAC",
+        "fantasyPositions": [
+          "C",
+          "PF"
+        ],
+        "teamIdAtCutoff": "1610612758",
+        "projectedGames": 51.525455,
+        "projectedMinutes": 1595.438256,
+        "projectedStats": {
+          "dd": 41.023218,
+          "pf": 164.630895,
+          "qd": 0,
+          "td": 6.762002,
+          "to": 147.533301,
+          "ast": 294.441438,
+          "blk": 14.646315,
+          "fga": 622.115947,
+          "fgm": 360.06379,
+          "fta": 227.49016,
+          "ftm": 169.19903,
+          "min": 1595.438256,
+          "pts": 920.793504,
+          "reb": 630.296595,
+          "stl": 39.898583,
+          "tpa": 101.932099,
+          "tpm": 31.466893,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2134.273361,
+        "projectedFptsPerGame": 41.42173,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 78,
+          "averages": 33
+        },
+        "lockIn": {
+          "liDelta": -4,
+          "totalRank": 68,
+          "averageRank": 37,
+          "projectedGames": 51.525,
+          "profileFallback": false,
+          "p10LockedInTotal": 775.1,
+          "p50LockedInTotal": 963.578,
+          "p90LockedInTotal": 1126.309,
+          "canonicalPlayerId": "b9a3765b-dbe8-490d-b2bb-4822603914dc",
+          "projectedTotalFpts": 2134.273,
+          "regularPerGameRank": 33,
+          "expectedActiveWeeks": 19.818,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 958.408
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 950.908
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 954.909
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 953.597
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 956.844
+            }
+          ],
+          "expectedLockedInTotal": 955.656,
+          "expectedSelectedStats": {
+            "dd": 18.369,
+            "pf": 73.716,
+            "qd": 0,
+            "td": 3.028,
+            "to": 66.06,
+            "ast": 131.841,
+            "blk": 6.558,
+            "fga": 278.563,
+            "fgm": 161.225,
+            "fta": 101.862,
+            "ftm": 75.762,
+            "min": 714.384,
+            "pts": 412.301,
+            "reb": 282.226,
+            "stl": 17.865,
+            "tpa": 45.642,
+            "tpm": 14.09,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 7.5,
+          "scheduleScenarioStdDev": 3.143,
+          "monteCarloStandardError": 0.966,
+          "expectedFptsPerActiveWeek": 48.222
+        }
+      },
+      {
+        "canonicalPlayerId": "48eb6f56-1e96-48e2-9478-4afb3abb5784",
+        "sleeperPlayerId": "2181",
+        "displayName": "Deni Avdija",
+        "teamAbbreviation": "POR",
+        "fantasyPositions": [
+          "PF",
+          "SF",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612757",
+        "projectedGames": 64,
+        "projectedMinutes": 2017.827634,
+        "projectedStats": {
+          "dd": 17.898457,
+          "pf": 167.189973,
+          "qd": 0,
+          "td": 2.342633,
+          "to": 213.027879,
+          "ast": 368.981979,
+          "blk": 39.04158,
+          "fga": 954.693423,
+          "fgm": 453.786662,
+          "fta": 490.226167,
+          "ftm": 390.7724,
+          "min": 2017.827634,
+          "pts": 1419.81801,
+          "reb": 484.898691,
+          "stl": 58.79045,
+          "tpa": 355.623454,
+          "tpm": 121.472287,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2582.851442,
+        "projectedFptsPerGame": 40.357054,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 36,
+          "averages": 39
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 38,
+          "averageRank": 38,
+          "projectedGames": 64,
+          "profileFallback": false,
+          "p10LockedInTotal": 931.938,
+          "p50LockedInTotal": 1086.521,
+          "p90LockedInTotal": 1205.815,
+          "canonicalPlayerId": "48eb6f56-1e96-48e2-9478-4afb3abb5784",
+          "projectedTotalFpts": 2582.851,
+          "regularPerGameRank": 39,
+          "expectedActiveWeeks": 22.384,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1075.819
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1076.457
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1075.968
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1075.754
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1076.008
+            }
+          ],
+          "expectedLockedInTotal": 1076.001,
+          "expectedSelectedStats": {
+            "dd": 7.456,
+            "pf": 69.65,
+            "qd": 0,
+            "td": 0.976,
+            "to": 88.746,
+            "ast": 153.716,
+            "blk": 16.265,
+            "fga": 397.72,
+            "fgm": 189.045,
+            "fta": 204.225,
+            "ftm": 162.794,
+            "min": 840.616,
+            "pts": 591.488,
+            "reb": 202.006,
+            "stl": 24.492,
+            "tpa": 148.151,
+            "tpm": 50.605,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 0.703,
+          "scheduleScenarioStdDev": 0.271,
+          "monteCarloStandardError": 0.765,
+          "expectedFptsPerActiveWeek": 48.07
+        }
+      },
+      {
+        "canonicalPlayerId": "e9d8721b-ad7b-40b8-9ccb-17f68d69e3bd",
+        "sleeperPlayerId": "2438",
+        "displayName": "Jalen Duren",
+        "teamAbbreviation": "DET",
+        "fantasyPositions": [
+          "C"
+        ],
+        "teamIdAtCutoff": "1610612765",
+        "projectedGames": 68.499911,
+        "projectedMinutes": 2048.214999,
+        "projectedStats": {
+          "dd": 42.424324,
+          "pf": 211.452066,
+          "qd": 0,
+          "td": 0.005438,
+          "to": 137.503486,
+          "ast": 149.658735,
+          "blk": 63.950944,
+          "fga": 775.66671,
+          "fgm": 510.846358,
+          "fta": 378.710318,
+          "ftm": 281.491198,
+          "min": 2048.214999,
+          "pts": 1309.099925,
+          "reb": 762.265258,
+          "stl": 57.439365,
+          "tpa": 16.335739,
+          "tpm": 5.91601,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2735.959813,
+        "projectedFptsPerGame": 39.941073,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 28,
+          "averages": 40
+        },
+        "lockIn": {
+          "liDelta": 1,
+          "totalRank": 30,
+          "averageRank": 39,
+          "projectedGames": 68.5,
+          "profileFallback": false,
+          "p10LockedInTotal": 982.531,
+          "p50LockedInTotal": 1119.655,
+          "p90LockedInTotal": 1221.231,
+          "canonicalPlayerId": "e9d8721b-ad7b-40b8-9ccb-17f68d69e3bd",
+          "projectedTotalFpts": 2735.96,
+          "regularPerGameRank": 40,
+          "expectedActiveWeeks": 23.129,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1107.869
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1111.162
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1111.034
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1105.954
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1112.482
+            }
+          ],
+          "expectedLockedInTotal": 1109.175,
+          "expectedSelectedStats": {
+            "dd": 17.199,
+            "pf": 85.724,
+            "qd": 0,
+            "td": 0.002,
+            "to": 55.745,
+            "ast": 60.673,
+            "blk": 25.926,
+            "fga": 314.46,
+            "fgm": 207.1,
+            "fta": 153.531,
+            "ftm": 114.118,
+            "min": 830.359,
+            "pts": 530.717,
+            "reb": 309.027,
+            "stl": 23.286,
+            "tpa": 6.623,
+            "tpm": 2.398,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 6.528,
+          "scheduleScenarioStdDev": 1.897,
+          "monteCarloStandardError": 0.673,
+          "expectedFptsPerActiveWeek": 47.957
+        }
+      },
+      {
+        "canonicalPlayerId": "78fafbdf-4c45-4cb7-81dd-94f99f846b01",
+        "sleeperPlayerId": "2449",
+        "displayName": "Dyson Daniels",
+        "teamAbbreviation": "ATL",
+        "fantasyPositions": [
+          "SF",
+          "SG"
+        ],
+        "teamIdAtCutoff": "1610612737",
+        "projectedGames": 69.98,
+        "projectedMinutes": 2386.216403,
+        "projectedStats": {
+          "dd": 12.312329,
+          "pf": 158.045523,
+          "qd": 0,
+          "td": 1.19433,
+          "to": 126.03865,
+          "ast": 394.727525,
+          "blk": 36.517296,
+          "fga": 866.919229,
+          "fgm": 438.803883,
+          "fta": 142.322528,
+          "ftm": 91.31884,
+          "min": 2386.216403,
+          "pts": 1019.715089,
+          "reb": 468.799119,
+          "stl": 148.143188,
+          "tpa": 180.12695,
+          "tpm": 50.788483,
+          "bonusPts40": 0,
+          "bonusPts50": 0
+        },
+        "projectedTotalFpts": 2775.007226,
+        "projectedFptsPerGame": 39.654289,
+        "rateSource": "team-scenario-allocation-v1",
+        "fallback": false,
+        "pointsRanks": {
+          "totals": 26,
+          "averages": 46
+        },
+        "lockIn": {
+          "liDelta": 6,
+          "totalRank": 28,
+          "averageRank": 40,
+          "projectedGames": 69.98,
+          "profileFallback": false,
+          "p10LockedInTotal": 998.588,
+          "p50LockedInTotal": 1129.944,
+          "p90LockedInTotal": 1226.249,
+          "canonicalPlayerId": "78fafbdf-4c45-4cb7-81dd-94f99f846b01",
+          "projectedTotalFpts": 2775.007,
+          "regularPerGameRank": 46,
+          "expectedActiveWeeks": 23.402,
+          "scenarioDiagnostics": [
+            {
+              "draws": 10000,
+              "sourceSeason": "2025",
+              "expectedLockedInTotal": 1119.806
+            },
+            {
+              "draws": 5000,
+              "sourceSeason": "2024",
+              "expectedLockedInTotal": 1118.894
+            },
+            {
+              "draws": 2500,
+              "sourceSeason": "2023",
+              "expectedLockedInTotal": 1121.226
+            },
+            {
+              "draws": 1500,
+              "sourceSeason": "2022",
+              "expectedLockedInTotal": 1118.833
+            },
+            {
+              "draws": 1000,
+              "sourceSeason": "2021",
+              "expectedLockedInTotal": 1120.742
+            }
+          ],
+          "expectedLockedInTotal": 1119.729,
+          "expectedSelectedStats": {
+            "dd": 4.968,
+            "pf": 63.772,
+            "qd": 0,
+            "td": 0.482,
+            "to": 50.857,
+            "ast": 159.275,
+            "blk": 14.735,
+            "fga": 349.806,
+            "fgm": 177.06,
+            "fta": 57.428,
+            "ftm": 36.848,
+            "min": 962.85,
+            "pts": 411.46,
+            "reb": 189.163,
+            "stl": 59.777,
+            "tpa": 72.682,
+            "tpm": 20.493,
+            "bonusPts40": 0,
+            "bonusPts50": 0
+          },
+          "scheduleScenarioRange": 2.393,
+          "scheduleScenarioStdDev": 0.754,
+          "monteCarloStandardError": 0.641,
+          "expectedFptsPerActiveWeek": 47.848
+        }
+      }
+    ],
+    "fptsPercentiles": {
+      "1054": 89,
+      "1085": 89,
+      "1240": 92,
+      "1272": 94,
+      "1308": 96,
+      "1362": 92,
+      "1380": 99,
+      "1433": 94,
+      "1613": 87,
+      "1658": 100,
+      "1711": 88,
+      "1739": 86,
+      "1747": 95,
+      "1822": 98,
+      "1830": 86,
+      "1845": 95,
+      "1846": 87,
+      "1945": 93,
+      "1957": 99,
+      "1967": 90,
+      "1970": 100,
+      "2007": 88,
+      "2126": 96,
+      "2133": 97,
+      "2161": 91,
+      "2179": 92,
+      "2181": 85,
+      "2259": 90,
+      "2267": 98,
+      "2284": 97,
+      "2289": 94,
+      "2308": 93,
+      "2313": 91,
+      "2316": 88,
+      "2438": 85,
+      "2449": 84,
+      "2453": 86,
+      "2574": 90,
+      "2577": 98,
+      "4760": 96
+    }
+  }
+}

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   formatGameLogMatchup,
   gameLogRowTone,
+  gameLogStatTone,
+  likelySeasonTeams,
   mergeSeasonGameLog,
 } from "@/lib/nba/game-log";
 
@@ -42,6 +44,32 @@ describe("season game log", () => {
     expect(formatGameLogMatchup("2026-04-12T00:00:00.000Z", "bos")).toBe("4/12 vs BOS");
   });
 
+  it("keeps the player's team and ignores frequent playoff opponents", () => {
+    expect(
+      likelySeasonTeams(
+        [
+          { teamId: 1610612765, season: "2025-26", games: 82 },
+          { teamId: 1610612753, season: "2025-26", games: 11 },
+          { teamId: 1610612742, season: "2025-26", games: 4 },
+        ],
+        { currentTeamId: 1610612765, seasons: ["2025-26"] },
+      ),
+    ).toEqual([{ teamId: 1610612765, season: "2025-26" }]);
+  });
+
+  it("keeps both clubs after a midseason trade", () => {
+    expect(
+      likelySeasonTeams([
+        { teamId: 1610612747, season: "2025-26", games: 40 },
+        { teamId: 1610612739, season: "2025-26", games: 30 },
+        { teamId: 1610612738, season: "2025-26", games: 4 },
+      ]),
+    ).toEqual([
+      { teamId: 1610612747, season: "2025-26" },
+      { teamId: 1610612739, season: "2025-26" },
+    ]);
+  });
+
   it("keeps only team-schedule games when a schedule is present", () => {
     const merged = mergeSeasonGameLog(
       [
@@ -66,10 +94,22 @@ describe("season game log", () => {
     expect(merged[0]?.didNotPlay).toBe(true);
   });
 
-  it("colors played games against season average FPTS", () => {
-    expect(gameLogRowTone(20, 15, false)).toBe("above");
-    expect(gameLogRowTone(16, 15, false)).toBe("average");
-    expect(gameLogRowTone(12, 15, false)).toBe("below");
-    expect(gameLogRowTone(0, 15, true)).toBe("dnp");
+  it("colors FPTS green through 5 below average, yellow 6-15 below, and red after that", () => {
+    expect(gameLogRowTone(40, 30, false)).toBe("above");
+    expect(gameLogRowTone(25, 30, false)).toBe("above");
+    expect(gameLogRowTone(24, 30, false)).toBe("average");
+    expect(gameLogRowTone(15, 30, false)).toBe("average");
+    expect(gameLogRowTone(14, 30, false)).toBe("below");
+    expect(gameLogRowTone(0, 30, true)).toBe("dnp");
+  });
+
+  it("scales other stats off FPTS, not real points, and inverts turnovers", () => {
+    expect(gameLogStatTone(22, 20, false, false, 40)).toBe("above");
+    expect(gameLogStatTone(17.5, 20, false, false, 40)).toBe("above");
+    expect(gameLogStatTone(17.4, 20, false, false, 40)).toBe("average");
+    expect(gameLogStatTone(12.5, 20, false, false, 40)).toBe("average");
+    expect(gameLogStatTone(12.4, 20, false, false, 40)).toBe("below");
+    expect(gameLogStatTone(1, 3, false, true, 40)).toBe("above");
+    expect(gameLogStatTone(8, 3, false, true, 40)).toBe("below");
   });
 });

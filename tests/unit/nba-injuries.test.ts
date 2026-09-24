@@ -22,13 +22,13 @@ describe("injury matching", () => {
     expect(canonicalTeamAbbr("lal")).toBe("LAL");
   });
 
-  it("maps ESPN status to GTD or OUT", () => {
+  it("maps ESPN status to GTD, DTD, or OUT", () => {
     expect(isInjuredStatus("Out")).toBe(true);
     expect(isInjuredStatus("Day-To-Day")).toBe(true);
     expect(isInjuredStatus("Probable")).toBe(false);
     expect(injuryStatusLabel("Out")).toBe("OUT");
     expect(injuryStatusLabel("Injured Reserve")).toBe("OUT");
-    expect(injuryStatusLabel("Day-To-Day")).toBe("GTD");
+    expect(injuryStatusLabel("Day-To-Day")).toBe("DTD");
     expect(injuryStatusLabel("Questionable")).toBe("GTD");
   });
 

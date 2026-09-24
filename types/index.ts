@@ -22,6 +22,7 @@ export type BoardBucketPlayer = {
   jerseyNumber: string | null;
   isActive: boolean;
   sortOrder: number;
+  notes: string | null;
 };
 
 export type BoardBucket = {

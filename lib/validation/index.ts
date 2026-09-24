@@ -96,6 +96,17 @@ export const sleeperDraftLinkSchema = z.object({
   sleeperDraftId: z.string().min(1),
 });
 
+export const updateBoardPlayerNotesSchema = z.object({
+  notes: z
+    .string()
+    .max(2000)
+    .nullable()
+    .transform((value) => {
+      const trimmed = value?.trim() ?? "";
+      return trimmed.length > 0 ? trimmed : null;
+    }),
+});
+
 export const bulkBoardPlayersSchema = z
   .object({
     action: z.enum(["move", "unassign"]),
@@ -114,5 +125,6 @@ export type CreateBucketInput = z.infer<typeof createBucketSchema>;
 export type UpdateBucketInput = z.infer<typeof updateBucketSchema>;
 export type PlayerSearchInput = z.infer<typeof playerSearchSchema>;
 export type AssignBoardPlayerInput = z.infer<typeof assignBoardPlayerSchema>;
+export type UpdateBoardPlayerNotesInput = z.infer<typeof updateBoardPlayerNotesSchema>;
 export type BulkBoardPlayersInput = z.infer<typeof bulkBoardPlayersSchema>;
 export type BoardPlayerMoveInput = z.infer<typeof boardPlayerMoveSchema>;
