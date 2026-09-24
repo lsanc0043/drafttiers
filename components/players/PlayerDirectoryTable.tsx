@@ -2,12 +2,16 @@
 
 import { useRef, useState, type DragEvent } from "react";
 import { createPortal } from "react-dom";
+import { PlayerDragGrip } from "@/components/board/PlayerDragGrip";
 import {
   InjuryBadge,
   setDraggingPlayer,
   type PlayerCardData,
 } from "@/components/players/PlayerCard";
 import { PlayerPhoto } from "@/components/players/PlayerPhoto";
+import { STICKY_TH_CLASS } from "@/components/ui/StickyTable";
+import { useCoarsePointer } from "@/hooks/useCoarsePointer";
+import type { PlayerDropDest } from "@/lib/board-drop-target";
 import type { PlayerListQuery } from "@/lib/nba/schema";
 
 export type DirectorySort = Exclude<PlayerListQuery["sort"], "fantasy">;
@@ -20,6 +24,7 @@ type PlayerDirectoryTableProps = {
   draggable?: boolean;
   onSort: (sort: DirectorySort) => void;
   onSelect: (player: PlayerCardData) => void;
+  onPointerDrop?: (player: PlayerCardData, dest: PlayerDropDest) => void;
 };
 
 const BASE_COLUMNS: Array<{ key: DirectorySort; label: string }> = [
@@ -95,11 +100,14 @@ function PlayerNameChip({
   player,
   draggable,
   onSelect,
+  onPointerDrop,
 }: {
   player: PlayerCardData;
   draggable?: boolean;
   onSelect: (player: PlayerCardData) => void;
+  onPointerDrop?: (player: PlayerCardData, dest: PlayerDropDest) => void;
 }) {
+  const coarse = useCoarsePointer();
   const didDrag = useRef(false);
   const [preview, setPreview] = useState<{ x: number; y: number } | null>(null);
 
@@ -112,10 +120,10 @@ function PlayerNameChip({
   }
 
   return (
-    <>
+    <div className="flex items-center gap-1">
       <button
         type="button"
-        draggable={draggable}
+        draggable={Boolean(draggable && !coarse)}
         onClick={() => {
           if (didDrag.current) {
             didDrag.current = false;
@@ -123,13 +131,13 @@ function PlayerNameChip({
           }
           onSelect(player);
         }}
-        onDragStart={draggable ? onDragStart : undefined}
+        onDragStart={draggable && !coarse ? onDragStart : undefined}
         onMouseEnter={(event) => {
           const box = event.currentTarget.getBoundingClientRect();
           setPreview({ x: box.left, y: box.bottom + 8 });
         }}
         onMouseLeave={() => setPreview(null)}
-        className="relative flex max-w-56 items-center gap-2 rounded-md px-1 py-0.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800"
+        className="relative flex min-w-0 max-w-56 items-center gap-2 rounded-md px-1 py-0.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800"
       >
         {player.isInjured ? (
           <InjuryBadge className="!static !left-auto !top-auto shrink-0" label={player.injuryLabel} />
@@ -147,6 +155,9 @@ function PlayerNameChip({
           </span>
         </span>
       </button>
+      {coarse && draggable ? (
+        <PlayerDragGrip player={player} onDrop={onPointerDrop} />
+      ) : null}
       {preview
         ? createPortal(
             <div
@@ -163,7 +174,7 @@ function PlayerNameChip({
             document.body,
           )
         : null}
-    </>
+    </div>
   );
 }
 
@@ -175,20 +186,21 @@ export function PlayerDirectoryTable({
   draggable,
   onSort,
   onSelect,
+  onPointerDrop,
 }: PlayerDirectoryTableProps) {
   const columns = showCustomColumns ? [...BASE_COLUMNS, ...CUSTOM_COLUMNS] : BASE_COLUMNS;
 
   return (
-    <table className="w-full min-w-[40rem] border-collapse text-sm">
-      <thead className="sticky top-0 z-10 bg-background">
-        <tr className="border-b border-zinc-200 text-left text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800">
-          <th className="bg-background px-2 py-2 font-medium">
+    <table className="w-full min-w-[40rem] border-separate border-spacing-0 text-sm">
+      <thead>
+        <tr className="text-left text-xs uppercase tracking-wide text-zinc-500">
+          <th className={`${STICKY_TH_CLASS} px-2 py-2 text-left font-medium`}>
             <button type="button" onClick={() => onSort("name")} className="hover:text-foreground">
               Player{sort === "name" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
             </button>
           </th>
           {columns.map((column) => (
-            <th key={column.key} className="bg-background px-2 py-2 text-right font-medium">
+            <th key={column.key} className={`${STICKY_TH_CLASS} px-2 py-2 text-right font-medium`}>
               <button type="button" onClick={() => onSort(column.key)} className="hover:text-foreground">
                 {column.label}
                 {sort === column.key ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
@@ -199,12 +211,17 @@ export function PlayerDirectoryTable({
       </thead>
         <tbody>
           {players.map((player) => (
-            <tr key={player.id} className="border-b border-zinc-100 dark:border-zinc-900">
-              <td className="px-2 py-1.5">
-                <PlayerNameChip player={player} draggable={draggable} onSelect={onSelect} />
+            <tr key={player.id}>
+              <td className="border-b border-zinc-100 px-2 py-1.5 dark:border-zinc-900">
+                <PlayerNameChip
+                  player={player}
+                  draggable={draggable}
+                  onSelect={onSelect}
+                  onPointerDrop={onPointerDrop}
+                />
               </td>
               {columns.map((column) => (
-                <td key={column.key} className="px-2 py-1.5 text-right tabular-nums">
+                <td key={column.key} className="border-b border-zinc-100 px-2 py-1.5 text-right tabular-nums dark:border-zinc-900">
                   {formatAvg(statForColumn(player, column.key))}
                 </td>
               ))}

@@ -23,6 +23,17 @@ export type BoardBucketPlayer = {
   isActive: boolean;
   sortOrder: number;
   notes: string | null;
+  favorited: boolean;
+  isInjured?: boolean;
+  injuryLabel?: "GTD" | "DTD" | "OUT" | null;
+  injuryUrl?: string | null;
+};
+
+export type BoardBucketGroup = {
+  id: string;
+  name: string;
+  color: string;
+  playerIds: string[];
 };
 
 export type BoardBucket = {
@@ -30,6 +41,7 @@ export type BoardBucket = {
   name: string;
   color: string;
   sortOrder: number;
+  groups: BoardBucketGroup[];
   players: BoardBucketPlayer[];
 };
 

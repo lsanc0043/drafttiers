@@ -18,14 +18,14 @@ export function PlayerPhoto({ nbaPersonId, fullName, size, photoSize }: PlayerPh
   const frameClass = isModal
     ? "h-24 w-24 text-2xl sm:h-32 sm:w-32 sm:text-3xl md:h-40 md:w-40 lg:h-48 lg:w-48 lg:text-4xl"
     : isCompact
-      ? "text-sm"
+      ? photoSize
+        ? "text-sm"
+        : "h-10 w-10 text-[10px] sm:h-20 sm:w-20 sm:text-sm"
       : "h-28 w-28 text-xl";
   const frameStyle =
     isCompact && photoSize
       ? { width: photoSize, height: photoSize }
-      : isCompact
-        ? { width: 64, height: 64 }
-        : undefined;
+      : undefined;
 
   if (nbaPersonId == null || failed) {
     return (

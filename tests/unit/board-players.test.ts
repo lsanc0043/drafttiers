@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { placeBoardPlayer, removeBoardPlayer, clearBoardPlayers, moveBoardPlayers, setBoardPlayerNotes } from "@/lib/board-players";
+import { placeBoardPlayer, removeBoardPlayer, clearBoardPlayers, moveBoardPlayers, setBoardPlayerNotes, setBoardPlayerFavorited } from "@/lib/board-players";
 import type { BoardBucket, BoardBucketPlayer } from "@/types";
 
-function player(id: string, assignmentId: string, sortOrder: number, notes: string | null = null): BoardBucketPlayer {
+function player(id: string, assignmentId: string, sortOrder: number, notes: string | null = null, favorited = false): BoardBucketPlayer {
   return {
     assignmentId,
     playerId: id,
@@ -15,11 +15,12 @@ function player(id: string, assignmentId: string, sortOrder: number, notes: stri
     isActive: true,
     sortOrder,
     notes,
+    favorited,
   };
 }
 
 function bucket(id: string, players: BoardBucketPlayer[]): BoardBucket {
-  return { id, name: id, color: "#808080", sortOrder: 0, players };
+  return { id, name: id, color: "#808080", sortOrder: 0, groups: [], players };
 }
 
 describe("placeBoardPlayer", () => {
@@ -88,5 +89,14 @@ describe("setBoardPlayerNotes", () => {
     const withNote = setBoardPlayerNotes(buckets, "jokic", "keep him");
     expect(withNote[0]?.players[0]?.notes).toBe("keep him");
     expect(setBoardPlayerNotes(withNote, "jokic", null)[0]?.players[0]?.notes).toBeNull();
+  });
+});
+
+describe("setBoardPlayerFavorited", () => {
+  it("toggles a player's favorite flag", () => {
+    const buckets = [bucket("S", [player("jokic", "a1", 0)])];
+    const favorited = setBoardPlayerFavorited(buckets, "jokic", true);
+    expect(favorited[0]?.players[0]?.favorited).toBe(true);
+    expect(setBoardPlayerFavorited(favorited, "jokic", false)[0]?.players[0]?.favorited).toBe(false);
   });
 });

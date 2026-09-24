@@ -8,6 +8,7 @@ import {
 import { PlayerNewsTab } from "@/components/players/PlayerNewsTab";
 import { PlayerPhoto } from "@/components/players/PlayerPhoto";
 import { PlayerTeamTab } from "@/components/players/PlayerTeamTab";
+import { STICKY_TH_CLASS } from "@/components/ui/StickyTable";
 import {
   averageFantasyPoints,
   scoreFantasyGame,
@@ -534,15 +535,15 @@ export function PlayerModal({
               </p>
             ) : null}
             {tab === "log" && detail && hasPlayedGames && seasonGames.length ? (
-              <div className="mt-2 overflow-x-auto md:min-h-0 md:flex-1 md:overflow-auto">
-                <table className="w-full min-w-lg text-left text-sm">
-                  <thead className="sticky top-0 bg-background text-zinc-300">
+              <div className="mt-2 min-h-0 max-h-[min(50dvh,24rem)] overflow-auto md:max-h-none md:flex-1">
+                <table className="w-full min-w-lg border-separate border-spacing-0 text-left text-sm">
+                  <thead>
                     <tr>
                       {["Date", "FPTS", "MIN", "PTS", "REB", "AST", "STL", "BLK", "TO"].map(
                         (header) => (
                           <th
                             key={header}
-                            className={`py-2 pr-2 font-medium ${header === "Date" ? "text-left" : "text-center"}`}
+                            className={`${STICKY_TH_CLASS} py-2 pr-2 font-medium text-zinc-500 ${header === "Date" ? "text-left" : "text-center"}`}
                           >
                             {header}
                           </th>

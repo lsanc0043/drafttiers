@@ -26,7 +26,10 @@ export function Navbar() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-background/95 backdrop-blur dark:border-zinc-800">
+    <header
+      data-app-nav
+      className="sticky top-0 z-50 border-b border-zinc-200 bg-background/95 backdrop-blur dark:border-zinc-800"
+    >
       <div className="relative z-50 flex items-center justify-between px-4 py-3">
         <Link href="/" className="text-lg font-semibold tracking-tight">
           DraftTier

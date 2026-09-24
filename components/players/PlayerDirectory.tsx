@@ -12,6 +12,8 @@ import {
 } from "@/components/players/PlayerDirectoryTable";
 import { PlayerModal } from "@/components/players/PlayerModal";
 import { useFantasyScoring } from "@/hooks/useFantasyScoring";
+import { useCoarsePointer } from "@/hooks/useCoarsePointer";
+import type { PlayerDropDest } from "@/lib/board-drop-target";
 
 type PlayersResponse = {
   players: PlayerCardData[];
@@ -27,6 +29,7 @@ type PlayerDirectoryProps = {
   variant?: "page" | "panel";
   draggable?: boolean;
   excludedPlayerIds?: ReadonlySet<string>;
+  onPointerDrop?: (player: PlayerCardData, dest: PlayerDropDest) => void;
 };
 
 function LoadingSpinner({ label }: { label: string }) {
@@ -77,8 +80,10 @@ export function PlayerDirectory({
   variant = "page",
   draggable = false,
   excludedPlayerIds,
+  onPointerDrop,
 }: PlayerDirectoryProps) {
   const isPanel = variant === "panel";
+  const coarse = useCoarsePointer();
   const [view, setView] = useState<DirectoryView>(isPanel ? "list" : "grid");
   const [query, setQuery] = useState("");
   const [team, setTeam] = useState("");
@@ -119,6 +124,10 @@ export function PlayerDirectory({
     }
     setSort(next);
     setSortDir(next === "name" ? "asc" : "desc");
+  }
+
+  function onPlayerSelect(player: PlayerCardData) {
+    setSelected(player);
   }
 
   useEffect(() => {
@@ -368,9 +377,10 @@ export function PlayerDirectory({
               sort={sort}
               sortDir={sortDir}
               showCustomColumns={showCustomColumns}
-              draggable={draggable}
+              draggable={draggable && !coarse}
               onSort={onSort}
-              onSelect={setSelected}
+              onSelect={onPlayerSelect}
+              onPointerDrop={onPointerDrop}
             />
           ) : (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
@@ -378,8 +388,8 @@ export function PlayerDirectory({
                 <PlayerCard
                   key={player.id}
                   player={player}
-                  draggable={draggable}
-                  onSelect={setSelected}
+                  draggable={draggable && !coarse}
+                  onSelect={onPlayerSelect}
                 />
               ))}
             </div>
